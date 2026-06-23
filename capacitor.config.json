@@ -1,0 +1,6 @@
+{
+  "appId": "com.laya.app",
+  "appName": "Laya",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

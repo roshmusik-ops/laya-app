@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Laya</string>
+    <string name="title_activity_main">Laya</string>
+    <string name="package_name">com.laya.app</string>
+    <string name="custom_url_scheme">com.laya.app</string>
+</resources>

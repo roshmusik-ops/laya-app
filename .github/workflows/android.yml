@@ -1,0 +1,41 @@
+name: Build Android App Bundle
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web App & Sync Capacitor
+        run: npm run build:android
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Build Android App Bundle
+        working-directory: ./android
+        run: ./gradlew bundleRelease
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Laya-Release-AAB
+          path: android/app/build/outputs/bundle/release/app-release.aab

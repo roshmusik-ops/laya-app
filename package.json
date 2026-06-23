@@ -1,0 +1,30 @@
+{
+  "name": "keralameet",
+  "private": true,
+  "version": "2.0.0",
+  "description": "KeralaМeet – Real Connections Across Kerala (Bumble + Dost grade)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "build": "npm run generate-sitemap && vite build",
+    "build:android": "npm run build && npx cap sync android",
+    "preview": "npm run generate-sitemap && vite preview"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "agora-rtc-sdk-ng": "^4.21.0",
+    "firebase": "^10.12.0",
+    "lucide-react": "^1.21.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^3.0.0",
+    "react-router-dom": "^7.16.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.4.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0"
+  }
+}
