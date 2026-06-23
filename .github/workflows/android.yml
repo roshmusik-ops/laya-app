@@ -36,7 +36,9 @@ jobs:
 
       - name: Build Android App Bundle
         working-directory: ./android
-        run: ./gradlew bundleRelease -Pandroid.injected.signing.store.file=app/laya-release.keystore -Pandroid.injected.signing.store.password=laya123 -Pandroid.injected.signing.key.alias=laya -Pandroid.injected.signing.key.password=laya123
+        run: |
+          chmod +x ./gradlew
+          ./gradlew bundleRelease -Pandroid.injected.signing.store.file=app/laya-release.keystore -Pandroid.injected.signing.store.password=laya123 -Pandroid.injected.signing.key.alias=laya -Pandroid.injected.signing.key.password=laya123
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
