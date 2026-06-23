@@ -30,12 +30,16 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Generate Keystore
+        working-directory: ./android/app
+        run: keytool -genkey -v -keystore laya-release.keystore -alias laya -keyalg RSA -keysize 2048 -validity 10000 -storepass laya123 -keypass laya123 -dname "CN=Roshmusik, OU=Laya, O=Roshmusik, L=Kerala, S=Kerala, C=IN"
+
       - name: Build Android App Bundle
         working-directory: ./android
-        run: ./gradlew bundleRelease
+        run: ./gradlew bundleRelease -Pandroid.injected.signing.store.file=app/laya-release.keystore -Pandroid.injected.signing.store.password=laya123 -Pandroid.injected.signing.key.alias=laya -Pandroid.injected.signing.key.password=laya123
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Laya-Release-AAB
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: android/app/build/outputs/bundle/release/*.aab
