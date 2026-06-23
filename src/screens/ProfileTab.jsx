@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../contexts/AppContext";
-import { openPaymentLink, ADDONS } from "../components/PremiumModal";
+// Removed PremiumModal import
 
 export default function ProfileTab() {
   const navigate = useNavigate();
@@ -97,13 +97,13 @@ export default function ProfileTab() {
 
       {/* Quick addons */}
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:9, marginBottom:14 }}>
-        <button onClick={() => openPaymentLink(ADDONS.boost.link)}
+        <button onClick={() => alert("Please download the Android app to purchase addons via Google Play.")}
           style={{ padding:"13px 10px", borderRadius:14, background:"rgba(255,107,107,.07)", border:"1px solid rgba(255,107,107,.2)", cursor:"pointer", color:"#f0ede8", fontFamily:"Nunito,sans-serif" }}>
           <div style={{ fontSize:18, marginBottom:3 }}>🚀</div>
           <div style={{ fontWeight:800, fontSize:12 }}>Boost Profile</div>
           <div style={{ color:"#ff6b6b", fontSize:11, fontWeight:700 }}>₹19 / 24hrs</div>
         </button>
-        <button onClick={() => openPaymentLink(ADDONS.verified.link)}
+        <button onClick={() => alert("Please download the Android app to purchase addons via Google Play.")}
           style={{ padding:"13px 10px", borderRadius:14, background:"rgba(96,165,250,.07)", border:"1px solid rgba(96,165,250,.2)", cursor:"pointer", color:"#f0ede8", fontFamily:"Nunito,sans-serif" }}>
           <div style={{ fontSize:18, marginBottom:3 }}>✅</div>
           <div style={{ fontWeight:800, fontSize:12 }}>Get Verified</div>
@@ -127,7 +127,7 @@ export default function ProfileTab() {
 
       {/* Sign out */}
       <button onClick={() => { setCurrentUser(null); navigate("/"); }}
-        style={{ width:"100%", padding:"12px", borderRadius:50, background:"none", border:"none", color:"rgba(255,71,87,.5)", fontFamily:"Nunito,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", border:"1px solid rgba(255,71,87,0.2)" }}>
+        style={{ width:"100%", padding:"12px", borderRadius:50, background:"none", color:"rgba(255,71,87,.5)", fontFamily:"Nunito,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", border:"1px solid rgba(255,71,87,0.2)" }}>
         Sign Out
       </button>
     </div>
