@@ -36,7 +36,7 @@ function SplashScreen() {
 
   const backgroundCards = [
     { name: "Meera", age: 24, img: "/fake1.jpg", rotate: -12, top: "5%", left: "2%", duration: "6s" },
-    { name: "Sneha", age: 22, img: "/fake2.jpg", rotate: -5, top: "2%", left: "25%", duration: "5s" },
+    { name: "Sneha", age: 22, img: "/sneha.png", rotate: -5, top: "2%", left: "25%", duration: "5s" },
     { name: "Priya", age: 23, img: "/fake3.jpg", rotate: 8, top: "6%", left: "80%", duration: "7s" },
     { name: "Arundhati", age: 26, img: "/fake4.jpg", rotate: -15, top: "30%", left: "2%", duration: "8s" },
     { name: "Nandita", age: 25, img: "/fake5.jpg", rotate: 12, top: "35%", left: "85%", duration: "6s" },
@@ -367,7 +367,7 @@ function SplashScreen() {
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: "50%", overflow: "hidden", border: "2px solid rgba(212,175,55,0.3)" }}>
-                  <img src="/girl1.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src="/ananya.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Ananya R.</div>
