@@ -21,7 +21,7 @@ import { getStorage } from "firebase/storage";
 // 👇 Load config from .env file
 const firebaseConfig = {
   apiKey: "AIzaSyDBxwldSWATlG2sWZKTj3uavFNVV1YT0go",
-  authDomain: "laya.roshmusik.com",
+  authDomain: "laya-new-2026.firebaseapp.com",
   projectId: "laya-new-2026",
   storageBucket: "laya-new-2026.firebasestorage.app",
   messagingSenderId: "519771329022",
