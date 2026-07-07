@@ -519,24 +519,6 @@ function MainApp() {
   // SECURITY FIX: Prevent unauthenticated users from bypassing the landing page
   if (!currentUser) return <Navigate to="/" replace />;
 
-  // Web paywall: Only Premium members can use the web version
-  const isNative = Capacitor.isNativePlatform();
-  if (!isNative && !currentUser?.premium) {
-    return (
-      <div className="app-wrap fade-in" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", padding:32, textAlign:"center", background: "#0a0a0a" }}>
-        <div style={{ marginBottom:24 }}>
-          <span style={{ fontSize:48 }}>🔒</span>
-        </div>
-        <h2 className="serif" style={{ fontSize:28, color:"#d4af37", marginBottom:16 }}>Premium Exclusive</h2>
-        <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, marginBottom:32, lineHeight:1.6, maxWidth:300 }}>
-          Laya Web is restricted to Premium Members. Please download the Android app from Google Play to subscribe and unlock web access.
-        </p>
-        <button className="btn-hot" style={{ padding:"16px 32px", fontSize: 14 }}>
-          Get the Android App
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="app-wrap" style={{ paddingBottom:72, minHeight:"100vh", overflowY:"auto", overflowX:"hidden", WebkitOverflowScrolling:"touch" }}>
