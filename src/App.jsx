@@ -533,11 +533,18 @@ function MainApp() {
         </div>
         <h2 className="serif" style={{ fontSize:28, color:"#d4af37", marginBottom:16 }}>Premium Exclusive</h2>
         <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, marginBottom:32, lineHeight:1.6, maxWidth:300 }}>
-          Laya Web is restricted to Premium Members. Please download the Android app from Google Play to subscribe and unlock web access.
+          Laya Web is restricted to Premium Members. Subscribe now to unlock full web access and start connecting.
         </p>
-        <button className="btn-hot" style={{ padding:"16px 32px", fontSize: 14 }}>
-          Get the Android App
+        <button 
+          className="btn-hot" 
+          style={{ padding:"16px 32px", fontSize: 14 }}
+          onClick={() => window.open("https://superprofile.bio/vp", "_blank")}
+        >
+          Subscribe Now
         </button>
+        <p style={{ color:"rgba(255,255,255,.4)", fontSize:12, marginTop:24, maxWidth:300, lineHeight:1.5 }}>
+          After subscribing, please contact support with your email to activate your account.
+        </p>
       </div>
     );
   }
