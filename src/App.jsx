@@ -35,7 +35,7 @@ function SplashScreen() {
   const navigate = useNavigate();
 
   const backgroundCards = [
-    { name: "Meera", age: 24, img: "/fake1.jpg", rotate: -12, top: "5%", left: "2%", duration: "6s" },
+    { name: "Meera", age: 24, img: "/girl1.png", rotate: -12, top: "5%", left: "2%", duration: "6s" },
     { name: "Sneha", age: 22, img: "/sneha.png", rotate: -5, top: "2%", left: "25%", duration: "5s" },
     { name: "Priya", age: 23, img: "/fake3.jpg", rotate: 8, top: "6%", left: "80%", duration: "7s" },
     { name: "Arundhati", age: 26, img: "/fake4.jpg", rotate: -15, top: "30%", left: "2%", duration: "8s" },
