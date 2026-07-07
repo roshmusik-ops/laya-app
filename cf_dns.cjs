@@ -4,8 +4,7 @@ const TOKEN = "cfut_D4o2CAOp0eMq6yl7mjzUaoJpDkHKocXpxT6USuDY3905fe87";
 const ZONE_ID = "41cffa813076c8714b0a8303d8ebedce";
 
 const recordsToAdd = [
-  { type: "A", name: "roshmusik.com", content: "76.76.21.21", proxied: false },
-  { type: "CNAME", name: "www.roshmusik.com", content: "cname.vercel-dns.com", proxied: false }
+  { type: "CNAME", name: "laya.roshmusik.com", content: "cname.vercel-dns.com", proxied: false }
 ];
 
 async function cfApi(method, path, body = null) {
