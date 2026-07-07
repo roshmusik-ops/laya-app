@@ -2,5 +2,9 @@
   "appId": "com.laya.app",
   "appName": "Laya",
   "webDir": "dist",
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "server": {
+    "hostname": "laya-app-2026.firebaseapp.com",
+    "androidScheme": "https"
+  }
 }

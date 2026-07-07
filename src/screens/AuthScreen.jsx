@@ -122,7 +122,7 @@ export default function AuthScreen() {
         <meta name="description" content="Request access to the most exclusive network in Kerala." />
       </Helmet>
       {/* Model background */}
-      <div style={{ position:"absolute", inset:0, backgroundImage:"url('/model.png')", backgroundSize:"cover", backgroundPosition:"center top", filter:"brightness(0.2) grayscale(0.2)" }} />
+      <div style={{ position:"absolute", inset:0, backgroundImage:"url('/realistic_bg.png')", backgroundSize:"cover", backgroundPosition:"center top", filter:"brightness(0.25) grayscale(0.1)" }} />
       <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom, rgba(5,5,5,0.4) 0%, rgba(5,5,5,0.85) 60%, rgba(5,5,5,1) 100%)" }} />
       <div style={{ position:"relative", zIndex:2, display:"flex", flexDirection:"column", flex:1 }}>
 
