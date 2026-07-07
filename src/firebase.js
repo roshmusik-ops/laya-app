@@ -20,13 +20,13 @@ import { getStorage } from "firebase/storage";
 
 // 👇 Load config from .env file
 const firebaseConfig = {
-  apiKey: "AIzaSyCwCOZoMwBggAh4PqdF1t1qcUOtWLDeFHs",
-  authDomain: "laya-app-2026.firebaseapp.com",
-  projectId: "laya-app-2026",
-  storageBucket: "laya-app-2026.firebasestorage.app",
-  messagingSenderId: "51785955505",
-  appId: "1:51785955505:web:f44b082c055391876f0a90",
-  measurementId: ""
+  apiKey: "AIzaSyDBxwldSWATlG2sWZKTj3uavFNVV1YT0go",
+  authDomain: "laya-new-2026.firebaseapp.com",
+  projectId: "laya-new-2026",
+  storageBucket: "laya-new-2026.firebasestorage.app",
+  messagingSenderId: "519771329022",
+  appId: "1:519771329022:web:d2c27334a460be855cf0af",
+  measurementId: "G-GWZC7B5K63"
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
