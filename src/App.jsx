@@ -2,6 +2,8 @@ import "./index.css";
 import { useRef, useState, useEffect } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { db } from "./firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import { AppProvider, useApp } from "./contexts/AppContext";
 import { Capacitor } from "@capacitor/core";
 
@@ -514,7 +516,22 @@ function TopNav() {
 
 // ── MAIN APP (after login) ────────────────────────────────────────────────────
 function MainApp() {
-  const { showMatch, showPremium, currentUser, selectedUser, setSelectedUser } = useApp();
+  const { showMatch, showPremium, currentUser, setCurrentUser, selectedUser, setSelectedUser } = useApp();
+  const [showKeyInput, setShowKeyInput] = useState(false);
+  const [activationKey, setActivationKey] = useState("");
+
+  const handleActivation = async () => {
+    if (activationKey.trim().toUpperCase() === "LAYA2026") {
+      try {
+        await updateDoc(doc(db, "users", currentUser.uid), { premium: true });
+        setCurrentUser({ ...currentUser, premium: true });
+      } catch (err) {
+        alert("Activation failed.");
+      }
+    } else {
+      alert("Invalid Activation Key.");
+    }
+  };
 
   // SECURITY FIX: Prevent unauthenticated users from bypassing the landing page
   if (!currentUser) return <Navigate to="/" replace />;
@@ -542,6 +559,30 @@ function MainApp() {
         >
           Subscribe Now
         </button>
+        
+        {showKeyInput ? (
+          <div style={{ marginTop: 24, display: "flex", gap: 8, flexDirection: "column", width: "100%", maxWidth: 300 }}>
+            <input 
+              type="text" 
+              placeholder="Enter 8-digit key"
+              value={activationKey}
+              onChange={(e) => setActivationKey(e.target.value)}
+              className="text-input"
+              style={{ textAlign: "center", textTransform: "uppercase" }}
+            />
+            <button className="btn-hot" onClick={handleActivation} style={{ background: "#22c55e", padding: "12px" }}>
+              Unlock Access
+            </button>
+          </div>
+        ) : (
+          <p 
+            onClick={() => setShowKeyInput(true)}
+            style={{ color:"#d4af37", fontSize:12, marginTop:24, cursor: "pointer", textDecoration: "underline" }}
+          >
+            Have an Activation Key?
+          </p>
+        )}
+
         <p style={{ color:"rgba(255,255,255,.4)", fontSize:12, marginTop:24, maxWidth:300, lineHeight:1.5 }}>
           After subscribing, please contact support with your email to activate your account.
         </p>
