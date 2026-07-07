@@ -521,7 +521,7 @@ function MainApp() {
 
   // Web paywall: Only Premium members can use the web version
   // VIP Founder Bypass list
-  const VIP_EMAILS = ["pharmalinkthrissur@gmail.com", "anoop@gmail.com"]; 
+  const VIP_EMAILS = ["pharmalinkthrissur@gmail.com", "anoop@gmail.com", "rosh.musik@gmail.com"]; 
   const isVIP = VIP_EMAILS.includes(currentUser?.email);
 
   const isNative = Capacitor.isNativePlatform();
