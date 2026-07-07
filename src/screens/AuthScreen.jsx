@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useApp } from "../contexts/AppContext";
 
 import { auth, db } from "../firebase";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function AuthScreen() {
   const navigate = useNavigate();
@@ -16,29 +16,36 @@ export default function AuthScreen() {
   const [loading, setLoading]   = useState(false);
   const [name, setName]         = useState("");
 
-  const handleGoogleLogin = async () => {
+  // Handle redirect result when user returns from Google sign-in
+  useEffect(() => {
     setLoading(true);
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setCurrentUser(userData);
-        navigate("/app");
-        showToast(`Welcome back, ${userData.name}! 🌴`);
-      } else {
-        setName(user.displayName || "");
-        setStep("name");
-      }
-    } catch (error) {
-      console.error("Error with Google login:", error);
-      showToast(error.message || "Failed to sign in. Try again.", "error");
-    } finally {
-      setLoading(false);
-    }
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (!result) { setLoading(false); return; }
+        const user = result.user;
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setCurrentUser(userData);
+          navigate("/app");
+          showToast(`Welcome back, ${userData.name}! 🌴`);
+        } else {
+          setName(user.displayName || "");
+          setStep("name");
+        }
+      })
+      .catch((error) => {
+        console.error("Redirect result error:", error);
+        if (error.code !== 'auth/no-auth-event') {
+          showToast(error.message || "Sign-in failed. Try again.", "error");
+        }
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleGoogleLogin = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithRedirect(auth, provider);
   };
 
   const handleFinish = () => {

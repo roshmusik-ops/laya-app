@@ -1,0 +1,33 @@
+[debug] [2026-07-07T22:58:15.750Z] ----------------------------------------------------------------------
+[debug] [2026-07-07T22:58:15.752Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ROSHITH\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting --project laya-new-2026
+[debug] [2026-07-07T22:58:15.753Z] CLI Version:   15.22.4
+[debug] [2026-07-07T22:58:15.753Z] Platform:      win32
+[debug] [2026-07-07T22:58:15.753Z] Node Version:  v24.14.1
+[debug] [2026-07-07T22:58:15.753Z] Detected Agent: antigravity
+[debug] [2026-07-07T22:58:15.753Z] Time:          Wed Jul 08 2026 04:28:15 GMT+0530 (India Standard Time)
+[debug] [2026-07-07T22:58:15.753Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-07T22:58:15.755Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-07-07T22:58:27.939Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-07T22:58:28.321Z] Running auto auth
+[debug] [2026-07-07T22:58:28.326Z] [iam] checking project laya-new-2026 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-07-07T22:58:28.330Z] No OAuth tokens found
+[debug] [2026-07-07T22:58:28.332Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/laya-new-2026:testIamPermissions [none]
+[debug] [2026-07-07T22:58:28.333Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/laya-new-2026:testIamPermissions  x-goog-user-project=laya-new-2026
+[debug] [2026-07-07T22:58:28.334Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/laya-new-2026:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-07-07T22:58:28.677Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-07-07T22:58:28.677Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-07-07T22:58:29.773Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/laya-new-2026:testIamPermissions 403
+[debug] [2026-07-07T22:58:29.774Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/laya-new-2026:testIamPermissions {"error":{"code":403,"message":"Caller does not have required permission to use project laya-new-2026. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=laya-new-2026 and then retry. Propagation of the new permission may take a few minutes.","status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"USER_PROJECT_DENIED","domain":"googleapis.com","metadata":{"consoleUrl":"https://console.developers.google.com/iam-admin/iam?project=laya-new-2026","consumer":"projects/laya-new-2026","containerInfo":"laya-new-2026","service":"cloudresourcemanager.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Caller does not have required permission to use project laya-new-2026. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=laya-new-2026 and then retry. Propagation of the new permission may take a few minutes."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developer console IAM admin","url":"https://console.developers.google.com/iam-admin/iam?project=laya-new-2026"}]}]}}
+[debug] [2026-07-07T22:58:29.777Z] [iam] error while checking permissions, command may fail: Request to https://cloudresourcemanager.googleapis.com/v1/projects/laya-new-2026:testIamPermissions had HTTP Error: 403, Caller does not have required permission to use project laya-new-2026. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=laya-new-2026 and then retry. Propagation of the new permission may take a few minutes.
+[debug] [2026-07-07T22:58:29.779Z] No OAuth tokens found
+[debug] [2026-07-07T22:58:29.779Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/laya-new-2026 [none]
+[debug] [2026-07-07T22:58:30.495Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/laya-new-2026 403
+[debug] [2026-07-07T22:58:30.495Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/laya-new-2026 {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2026-07-07T22:58:30.497Z] Request to https://firebase.googleapis.com/v1beta1/projects/laya-new-2026 had HTTP Error: 403, The caller does not have permission
+[debug] [2026-07-07T22:58:30.500Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/laya-new-2026 had HTTP Error: 403, The caller does not have permission
+    at responseToError (C:\Users\ROSHITH\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\responseToError.js:53:12)
+    at RetryOperation._fn (C:\Users\ROSHITH\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\apiv2.js:381:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[error] 
+[error] Error: Failed to get Firebase project laya-new-2026. Please make sure the project exists and your account has permission to access it.
