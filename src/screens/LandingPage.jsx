@@ -67,15 +67,16 @@ export default function LandingPage() {
         </div>
         
         {/* Navigation links */}
-        <nav style={{ display: "flex", gap: 24, fontSize: 13, fontWeight: 500, color: "rgba(255, 255, 255, 0.7)" }}>
-          <span style={{ cursor: "pointer" }} onClick={() => navigate("/")}>Products</span>
-          <span style={{ cursor: "pointer" }}>Learn</span>
-          <span style={{ cursor: "pointer" }}>Safety</span>
-          <span style={{ cursor: "pointer" }}>Support</span>
+        <nav className="desktop-only" style={{ display: "flex", gap: 24, fontSize: 13, fontWeight: 500, color: "rgba(255, 255, 255, 0.7)" }}>
+          <span style={{ cursor: "pointer" }} onClick={() => alert("Products page coming soon!")}>Products</span>
+          <span style={{ cursor: "pointer" }} onClick={() => alert("Learn page coming soon!")}>Learn</span>
+          <span style={{ cursor: "pointer" }} onClick={() => alert("Safety guidelines coming soon!")}>Safety</span>
+          <span style={{ cursor: "pointer" }} onClick={() => alert("Support portal coming soon!")}>Support</span>
         </nav>
 
+        {/* Log in Button */}
         <button onClick={() => navigate("/request-access")}
-          style={{ background: "#fcfcfc", color: "#000", border: "none", borderRadius: 24, padding: "8px 24px", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease" }}>
+          style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 24, padding: "9px 26px", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease" }}>
           Log in
         </button>
       </header>
