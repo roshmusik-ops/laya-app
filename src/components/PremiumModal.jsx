@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useApp } from "../contexts/AppContext";
 import { purchasePackage, fetchOfferings } from "../services/revenuecat";
+import { db } from "../firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
 // ── GOOGLE PLAY BILLING (Mock) ──────────────────────────────────────────
 export const PLANS = {
@@ -123,22 +125,40 @@ export default function PremiumModal() {
     }
   };
 
-  const handleActivationKey = () => {
+  const handleActivationKey = async () => {
     const key = activationKey.trim().toUpperCase();
-    if (key === "LAYAGOLD") {
-      setCurrentUser({ ...currentUser, premium: true, plan: "Gold" });
-      showToast("Key applied! Welcome to Gold! 🎉", "success");
-      setShowPremium(false);
+    const now = Date.now();
+    let updates = {};
+
+    if (key === "LAYA2026") {
+      updates = { premium: true, premiumUntil: now + 100 * 365 * 24 * 60 * 60 * 1000, plan: "Gold" };
+      showToast("Master Key applied! 🎉", "success");
+    } else if (key === "LAYA-MONTHLY") {
+      updates = { premium: true, premiumUntil: now + 30 * 24 * 60 * 60 * 1000, plan: "Gold" };
+      showToast("30 Days Gold applied! 🎉", "success");
+    } else if (key === "LAYA-YEARLY") {
+      updates = { premium: true, premiumUntil: now + 365 * 24 * 60 * 60 * 1000, plan: "Gold" };
+      showToast("1 Year Gold applied! 🎉", "success");
     } else if (key === "LAYAPLATINUM") {
-      setCurrentUser({ ...currentUser, premium: true, plan: "Platinum" });
-      showToast("Key applied! Welcome to Platinum! 🎉", "success");
-      setShowPremium(false);
-    } else if (key === "LAYAVERIFIED") {
-      setCurrentUser({ ...currentUser, verified: true });
-      showToast("Key applied! Profile Verified! ✅", "success");
-      setShowPremium(false);
+      updates = { premium: true, premiumUntil: now + 30 * 24 * 60 * 60 * 1000, plan: "Platinum" };
+      showToast("30 Days Platinum applied! 🎉", "success");
+    } else if (key === "LAYA-BOOST") {
+      updates = { boostUntil: now + 24 * 60 * 60 * 1000 };
+      showToast("24hr Boost active! 🚀", "success");
+    } else if (key === "LAYA-VERIFIED") {
+      updates = { verified: true };
+      showToast("Profile Verified! ✅", "success");
     } else {
       showToast("Invalid or expired activation key.", "error");
+      return;
+    }
+
+    try {
+      await updateDoc(doc(db, "users", currentUser.uid), updates);
+      setCurrentUser({ ...currentUser, ...updates });
+      setShowPremium(false);
+    } catch (err) {
+      showToast("Error applying key.", "error");
     }
   };
 

@@ -521,15 +521,32 @@ function MainApp() {
   const [activationKey, setActivationKey] = useState("");
 
   const handleActivation = async () => {
-    if (activationKey.trim().toUpperCase() === "LAYA2026") {
-      try {
-        await updateDoc(doc(db, "users", currentUser.uid), { premium: true });
-        setCurrentUser({ ...currentUser, premium: true });
-      } catch (err) {
-        alert("Activation failed.");
-      }
+    const key = activationKey.trim().toUpperCase();
+    const now = Date.now();
+    let updates = {};
+
+    if (key === "LAYA2026") {
+      updates = { premium: true, premiumUntil: now + 100 * 365 * 24 * 60 * 60 * 1000, plan: "Gold" }; // 100 years
+    } else if (key === "LAYA-MONTHLY") {
+      updates = { premium: true, premiumUntil: now + 30 * 24 * 60 * 60 * 1000, plan: "Gold" };
+    } else if (key === "LAYA-YEARLY") {
+      updates = { premium: true, premiumUntil: now + 365 * 24 * 60 * 60 * 1000, plan: "Gold" };
+    } else if (key === "LAYA-BOOST") {
+      updates = { boostUntil: now + 24 * 60 * 60 * 1000 };
+    } else if (key === "LAYA-VERIFIED") {
+      updates = { verified: true };
     } else {
       alert("Invalid Activation Key.");
+      return;
+    }
+
+    try {
+      await updateDoc(doc(db, "users", currentUser.uid), updates);
+      setCurrentUser({ ...currentUser, ...updates });
+      setShowKeyInput(false);
+      setActivationKey("");
+    } catch (err) {
+      alert("Activation failed.");
     }
   };
 
@@ -542,7 +559,10 @@ function MainApp() {
   const isVIP = VIP_EMAILS.includes(currentUser?.email);
 
   const isNative = Capacitor.isNativePlatform();
-  if (!isNative && !currentUser?.premium && !isVIP) {
+  const now = Date.now();
+  const hasPremium = currentUser?.premiumUntil ? currentUser.premiumUntil > now : currentUser?.premium;
+  
+  if (!isNative && !hasPremium && !isVIP) {
     return (
       <div className="app-wrap fade-in" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", padding:32, textAlign:"center", background: "#0a0a0a" }}>
         <div style={{ marginBottom:24 }}>
