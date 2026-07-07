@@ -20,13 +20,13 @@ import { getStorage } from "firebase/storage";
 
 // 👇 Load config from .env file
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyCwCOZoMwBggAh4PqdF1t1qcUOtWLDeFHs",
+  authDomain: "laya-app-2026.firebaseapp.com",
+  projectId: "laya-app-2026",
+  storageBucket: "laya-app-2026.firebasestorage.app",
+  messagingSenderId: "51785955505",
+  appId: "1:51785955505:web:f44b082c055391876f0a90",
+  measurementId: ""
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

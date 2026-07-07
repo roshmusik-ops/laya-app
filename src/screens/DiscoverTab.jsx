@@ -6,12 +6,15 @@ const SWIPE_THRESHOLD = 80;
 export default function DiscoverTab() {
   const { discoverUsers, handleSwipeRight, handleSwipeLeft, setSelectedUser, setShowConnect, currentUser, setShowPremium } = useApp();
   const [photoIdx, setPhotoIdx]   = useState({});
-  const [dragStart, setDragStart] = useState(null);
-  const [dragX, setDragX]         = useState(0);
   const [animating, setAnimating] = useState(null); // "left"|"right"
   const [filterDistrict, setFilterDistrict] = useState("All");
   const [filterMode, setFilterMode]         = useState("All");
   const cardRef = useRef();
+  
+  const dragStart = useRef(null);
+  const dragX = useRef(0);
+  const passIndicator = useRef(null);
+  const approveIndicator = useRef(null);
 
   const DISTRICTS = ["All","Ernakulam","Thrissur","Kozhikode","Thiruvananthapuram","Palakkad","Kannur","Kottayam","Malappuram"];
   const MODES     = ["All","date","intimacy","friends","network"];
@@ -26,29 +29,61 @@ export default function DiscoverTab() {
   const photos = (user) => (user?.photos || []).filter(Boolean);
 
   const onDragStart = (e) => {
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    setDragStart(x);
-    setDragX(0);
+    dragStart.current = e.touches ? e.touches[0].clientX : e.clientX;
+    dragX.current = 0;
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'none';
+    }
   };
+
   const onDragMove = (e) => {
-    if (dragStart === null) return;
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - dragStart;
-    setDragX(x);
+    if (dragStart.current === null) return;
+    dragX.current = (e.touches ? e.touches[0].clientX : e.clientX) - dragStart.current;
+    
+    if (cardRef.current) {
+      const rotation = dragX.current * 0.08;
+      cardRef.current.style.transform = `translateX(${dragX.current}px) rotate(${rotation}deg)`;
+    }
+    
+    // Update indicators manually to prevent re-renders
+    if (passIndicator.current) {
+      passIndicator.current.style.opacity = dragX.current < -40 ? 1 : 0;
+    }
+    if (approveIndicator.current) {
+      approveIndicator.current.style.opacity = dragX.current > 40 ? 1 : 0;
+    }
   };
+
   const onDragEnd = () => {
-    if (Math.abs(dragX) >= SWIPE_THRESHOLD && top) {
-      const dir = dragX > 0 ? "right" : "left";
+    if (dragStart.current === null) return;
+    const currentX = dragX.current;
+    
+    if (Math.abs(currentX) >= SWIPE_THRESHOLD && top) {
+      const dir = currentX > 0 ? "right" : "left";
       setAnimating(dir);
+      
+      if (passIndicator.current) passIndicator.current.style.opacity = 0;
+      if (approveIndicator.current) approveIndicator.current.style.opacity = 0;
+      
       setTimeout(() => {
         dir === "right" ? handleSwipeRight(top) : handleSwipeLeft(top);
         setAnimating(null);
-        setDragX(0);
-        setDragStart(null);
         setPhotoIdx({});
+        dragX.current = 0;
+        dragStart.current = null;
+        if (cardRef.current) cardRef.current.style.transform = '';
       }, 350);
     } else {
-      setDragX(0);
-      setDragStart(null);
+      // Snap back
+      if (cardRef.current) {
+        cardRef.current.style.transition = 'transform 0.3s ease';
+        cardRef.current.style.transform = `translateX(0px) rotate(0deg)`;
+      }
+      if (passIndicator.current) passIndicator.current.style.opacity = 0;
+      if (approveIndicator.current) approveIndicator.current.style.opacity = 0;
+      
+      dragX.current = 0;
+      dragStart.current = null;
     }
   };
 
@@ -58,11 +93,11 @@ export default function DiscoverTab() {
     setTimeout(() => {
       dir === "right" ? handleSwipeRight(top) : handleSwipeLeft(top);
       setAnimating(null); setPhotoIdx({});
+      dragX.current = 0;
+      dragStart.current = null;
+      if (cardRef.current) cardRef.current.style.transform = '';
     }, 350);
   };
-
-  const rotation = dragX * 0.08;
-  const opacity  = Math.max(0, 1 - Math.abs(dragX) / 200);
 
   return (
     <div style={{ padding:"12px 14px", animation:"fadeIn .4s ease" }}>
@@ -106,7 +141,11 @@ export default function DiscoverTab() {
           {filtered[1] && (
             <div style={{ position:"absolute", inset:0, borderRadius:20, overflow:"hidden", transform:"scale(.95) translateY(12px)", opacity:.4, zIndex:1 }}>
               <div style={{ height:"100%", background:"linear-gradient(180deg,rgba(255,255,255,.05),rgba(5,5,5,1))", border:"1px solid rgba(255,255,255,.05)", borderRadius:20 }}>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"55%", fontSize:64, opacity: 0.2 }}>{filtered[1].photos?.[0] || "👤"}</div>
+                {filtered[1].photos?.[0] && filtered[1].photos[0].length > 2 ? (
+                  <img src={filtered[1].photos[0]} alt="next" style={{ width:"100%", height:"100%", objectFit:"cover", filter: "brightness(0.5)" }} />
+                ) : (
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"55%", fontSize:64, opacity: 0.2 }}>{filtered[1].photos?.[0] || "👤"}</div>
+                )}
               </div>
             </div>
           )}
@@ -117,9 +156,9 @@ export default function DiscoverTab() {
               ref={cardRef}
               className={`swipe-card ${animating === "left" ? "animating-left" : animating === "right" ? "animating-right" : ""}`}
               style={{
-                zIndex:2, height:500, cursor:"grab",
-                transform: animating ? undefined : `translateX(${dragX}px) rotate(${rotation}deg)`,
-                transition: dragStart ? "none" : "transform .2s ease",
+                zIndex:2, height:500, cursor:"grab", touchAction: "pan-y",
+                transform: animating ? undefined : "translateX(0px) rotate(0deg)",
+                transition: dragStart.current === null ? "transform .2s ease" : "none",
               }}
               onMouseDown={onDragStart} onMouseMove={onDragMove} onMouseUp={onDragEnd} onMouseLeave={onDragEnd}
               onTouchStart={onDragStart} onTouchMove={onDragMove} onTouchEnd={onDragEnd}>
@@ -161,16 +200,12 @@ export default function DiscoverTab() {
                   onClick={e => { e.stopPropagation(); setPhotoIdx(p => ({...p, [top.id]: Math.min(photos(top).length-1,(p[top.id]||0)+1)})); }} />
 
                 {/* Swipe indicators */}
-                {dragX > 40 && (
-                  <div style={{ position:"absolute", top:32, left:24, border:"1px solid rgba(255,255,255,0.8)", borderRadius:8, padding:"6px 16px", transform:"rotate(-15deg)", zIndex:4, backdropFilter:"blur(10px)" }}>
-                    <span style={{ color:"#fcfcfc", fontWeight:500, fontSize:18, letterSpacing:"0.1em" }}>PASS</span>
-                  </div>
-                )}
-                {dragX < -40 && (
-                  <div style={{ position:"absolute", top:32, right:24, border:"1px solid rgba(212, 175, 55, 0.8)", borderRadius:8, padding:"6px 16px", transform:"rotate(15deg)", zIndex:4, backdropFilter:"blur(10px)", background: "rgba(212, 175, 55, 0.1)" }}>
-                    <span style={{ color:"#d4af37", fontWeight:500, fontSize:18, letterSpacing:"0.1em" }}>APPROVE</span>
-                  </div>
-                )}
+                <div ref={passIndicator} style={{ position:"absolute", top:32, left:24, border:"1px solid rgba(255,255,255,0.8)", borderRadius:8, padding:"6px 16px", transform:"rotate(-15deg)", zIndex:4, backdropFilter:"blur(10px)", opacity: 0, transition: "opacity 0.2s" }}>
+                  <span style={{ color:"#fcfcfc", fontWeight:500, fontSize:18, letterSpacing:"0.1em" }}>PASS</span>
+                </div>
+                <div ref={approveIndicator} style={{ position:"absolute", top:32, right:24, border:"1px solid rgba(212, 175, 55, 0.8)", borderRadius:8, padding:"6px 16px", transform:"rotate(15deg)", zIndex:4, backdropFilter:"blur(10px)", background: "rgba(212, 175, 55, 0.1)", opacity: 0, transition: "opacity 0.2s" }}>
+                  <span style={{ color:"#d4af37", fontWeight:500, fontSize:18, letterSpacing:"0.1em" }}>APPROVE</span>
+                </div>
 
                 {/* Gradient overlay */}
                 <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"60%", background:"linear-gradient(transparent 0%, rgba(5,5,5,0.8) 50%, rgba(5,5,5,1) 100%)", zIndex:2 }} />
@@ -194,6 +229,12 @@ export default function DiscoverTab() {
                           <span style={{ opacity:0.6 }}>by {top.favoriteArtist}</span>
                         </div>
                       )}
+                      {top.musicLink && (
+                        <a href={top.musicLink} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(30,215,96,0.12)", border:"1px solid rgba(30,215,96,0.25)", borderRadius:12, padding:"4px 10px", marginTop:8, marginLeft:8, fontSize:11, fontWeight:500, color:"#1db954", letterSpacing:"0.02em", textDecoration:"none" }}>
+                          <span style={{ fontSize:10 }}>🎧 {top.musicLinkType || 'Music'}:</span>
+                          <span style={{ color:"#fff", textDecoration:"underline" }}>View Profile</span>
+                        </a>
+                      )}
                     </div>
                     <button onClick={e => { e.stopPropagation(); setSelectedUser(top); }}
                       style={{ width:36, height:36, borderRadius:"50%", background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,0.7)", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.3s ease" }}
@@ -202,7 +243,7 @@ export default function DiscoverTab() {
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     </button>
                   </div>
-                  <p style={{ color:"rgba(255,255,255,.6)", fontSize:13, lineHeight:1.6, marginBottom:16, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden", fontWeight:300 }}>{top.bio}</p>
+                  <p style={{ color:"rgba(255,255,255,.6)", fontSize:13, lineHeight:1.6, marginBottom:16, maxHeight: 80, overflowY:"auto", fontWeight:300 }}>{top.bio}</p>
                   <div style={{ marginBottom:20 }}>{(top.tags||[]).map(t => <span key={t} className="tag">{t}</span>)}</div>
 
                   {/* Action buttons */}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useApp } from "../contexts/AppContext";
 
@@ -9,6 +9,8 @@ import { doc, getDoc } from "firebase/firestore";
 
 export default function AuthScreen() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const selectedPlan = location.state?.plan || "Free";
   const { setCurrentUser, showToast } = useApp();
   const [step, setStep]         = useState("phone"); // phone | otp | name
   const [phone, setPhone]       = useState("");
@@ -21,84 +23,59 @@ export default function AuthScreen() {
       showToast("Enter a valid 10-digit number", "error"); return;
     }
     setLoading(true);
-    
     try {
       if (!window.recaptchaVerifier) {
         window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'invisible'
+          size: 'invisible',
+          callback: (response) => {}
         });
       }
-      
-      const formattedPhone = "+91" + phone;
-      const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, window.recaptchaVerifier);
+      const formatPhone = "+91" + phone.replace(/\D/g,"");
+      const confirmationResult = await signInWithPhoneNumber(auth, formatPhone, window.recaptchaVerifier);
       window.confirmationResult = confirmationResult;
-      
-      setLoading(false);
       setStep("otp");
-      showToast("OTP sent to +91 " + phone + " 📱");
+      showToast("Verification code sent!");
     } catch (error) {
-      console.error(error);
+      console.error("Error sending OTP:", error);
+      showToast(error.message || "Failed to send code. Try again.", "error");
+    } finally {
       setLoading(false);
-      showToast(error.message, "error");
     }
   };
 
   const handleVerifyOtp = async () => {
     const code = otp.join("");
-    if (code.length < 6) { showToast("Enter 6-digit OTP", "error"); return; }
+    if (code.length < 6) {
+      showToast("Enter all 6 digits", "error"); return;
+    }
     setLoading(true);
-    
     try {
-      const result = await window.confirmationResult.confirm(code);
+      const confirmationResult = window.confirmationResult;
+      if (!confirmationResult) {
+        showToast("Session expired. Please request OTP again.", "error");
+        setStep("phone");
+        return;
+      }
+      const result = await confirmationResult.confirm(code);
       const user = result.user;
       
-      // Check if user exists in Firestore
+      // Check if user document exists in Firestore
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      
-      setLoading(false);
       if (userDoc.exists()) {
         const userData = userDoc.data();
         setCurrentUser(userData);
         navigate("/app");
         showToast(`Welcome back, ${userData.name}! 🌴`);
       } else {
-        // New user
+        // New user - go to name input phase
         setStep("name");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error verifying OTP:", error);
+      showToast("Invalid code. Please try again.", "error");
+    } finally {
       setLoading(false);
-      showToast("Invalid OTP code", "error");
     }
-  };
-
-  // ── Quick demo login — no phone needed ───────────────────────────────────
-  const handleDemoLogin = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const demoUser = {
-        id: "demo_" + Date.now(),
-        name: "Demo User",
-        age: 25,
-        district: "Ernakulam",
-        bio: "Just exploring KeralaМeet! 🌴",
-        photos: ["👤","","",""],
-        tags: ["Travel","Music"],
-        gender: "Other",
-        lookingFor: "Friends & Activity Partners",
-        verified: false,
-        premium: false,
-        online: true,
-        whatsapp: "+919000000000",
-        mode: "friends",
-        joined: "Just now",
-        status: "approved",
-      };
-      setCurrentUser(demoUser);
-      navigate("/app");
-      showToast("Welcome to Laya! 🌴");
-      setLoading(false);
-    }, 800);
   };
 
   const handleOtpKey = (val, i, ref) => {
@@ -132,7 +109,7 @@ export default function AuthScreen() {
       status: "approved",
     };
     setCurrentUser(newUser);
-    navigate("/setup");
+    navigate("/setup", { state: { plan: selectedPlan } });
     showToast(`Welcome to Laya, ${name}! 🌴`);
   };
 
@@ -160,20 +137,12 @@ export default function AuthScreen() {
         </p>
       </div>
 
-      {/* ── DEMO BANNER ── */}
+      {/* ── OTP GATEWAY ENFORCED ── */}
       <div style={{ background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:16, padding:"16px 20px", marginBottom:32, textAlign:"center", backdropFilter: "blur(10px)" }}>
-        <div style={{ fontSize:10, color:"#d4af37", fontWeight:500, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>Demo Access</div>
+        <div style={{ fontSize:10, color:"#ff6b6b", fontWeight:500, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:8 }}>🛡️ Security Notice</div>
         <div style={{ fontSize:12, color:"rgba(255,255,255,.5)", lineHeight:1.6, fontWeight: 300 }}>
-          Enter any phone number and any 6 digits.<br/>Or select instant access below.
+          To ensure a genuine community, all users must verify their identity via mobile number and secure OTP verification.
         </div>
-        <button
-          onClick={handleDemoLogin}
-          disabled={loading}
-          style={{ marginTop:14, padding:"10px 24px", borderRadius:30, background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", color:"#fcfcfc", fontFamily:"Inter,sans-serif", fontWeight:400, fontSize:12, cursor:"pointer", transition: "all 0.3s ease", letterSpacing:"0.05em", textTransform:"uppercase" }}
-          onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.1)"}
-          onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,0.05)"}>
-          {loading ? "Authenticating..." : "Instant Access"}
-        </button>
       </div>
 
       {/* ── STEP 1: Phone ── */}

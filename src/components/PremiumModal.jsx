@@ -1,21 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useApp } from "../contexts/AppContext";
+import { purchasePackage, fetchOfferings } from "../services/revenuecat";
 
 // ── GOOGLE PLAY BILLING (Mock) ──────────────────────────────────────────
 export const PLANS = {
-  monthly: {
-    id:     "laya_monthly",
-    label:  "Monthly",
-    price:  "₹29.00",
-    desc:   "₹29 / month",
+  gold_monthly: {
+    id:     "laya_gold_monthly",
+    label:  "Gold Monthly",
+    price:  "₹99.00",
+    desc:   "₹99 / mo",
     save:   null,
+    color:  "#d4af37"
   },
-  yearly: {
-    id:     "laya_yearly",
-    label:  "Yearly",
+  gold_yearly: {
+    id:     "laya_gold_yearly",
+    label:  "Gold Yearly",
+    price:  "₹999.00",
+    desc:   "₹999 / yr",
+    save:   "Save ₹189",
+    color:  "#d4af37"
+  },
+  plat_monthly: {
+    id:     "laya_plat_monthly",
+    label:  "Platinum Monthly",
     price:  "₹199.00",
-    desc:   "₹199 / year",
-    save:   "Save ₹149",
+    desc:   "₹199 / mo",
+    save:   null,
+    color:  "#ff6b6b"
+  },
+  plat_yearly: {
+    id:     "laya_plat_yearly",
+    label:  "Platinum Yearly",
+    price:  "₹1999.00",
+    desc:   "₹1999 / yr",
+    save:   "Save ₹389",
+    color:  "#ff6b6b"
   },
 };
 
@@ -27,8 +46,31 @@ export const ADDONS = {
 
 // ── PREMIUM MODAL COMPONENT ───────────────────────────────────────────────
 export default function PremiumModal() {
-  const { setShowPremium, currentUser, showToast } = useApp();
-  const [selected, setSelected] = useState("laya_yearly");
+  const { setShowPremium, currentUser, setCurrentUser, showToast } = useApp();
+  const [selected, setSelected] = useState("laya_gold_yearly");
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [rcPackages, setRcPackages] = useState([]);
+  const [activationKey, setActivationKey] = useState("");
+
+  const SP_LINKS = {
+    laya_gold_monthly: "https://superprofile.bio/vp/gold-monthly",
+    laya_gold_yearly: "https://superprofile.bio/vp/gold-yearly",
+    laya_plat_monthly: "https://superprofile.bio/vp/platinum-monthly",
+    laya_plat_yearly: "https://superprofile.bio/vp/platinum-yearly",
+    laya_super5: "https://superprofile.bio/vp/5-superconnects",
+    laya_boost: "https://superprofile.bio/vp/--24hr-profile-boost",
+    laya_verified: "https://superprofile.bio/vp/--verified-badge"
+  };
+
+  useEffect(() => {
+    const loadOfferings = async () => {
+      const pkgs = await fetchOfferings();
+      if (pkgs && pkgs.length > 0) {
+        setRcPackages(pkgs);
+      }
+    };
+    loadOfferings();
+  }, []);
 
   const features = [
     { icon:"❤️", text:"Unlimited swipes & matches"     },
@@ -44,55 +86,96 @@ export default function PremiumModal() {
     { icon:"🚫", text:"Zero ads, ever"                 },
   ];
 
-  const handleUpgrade = () => {
-    // In a real Android app using Capacitor, you would use a plugin here:
-    // e.g. import { GooglePlayBilling } from '@capacitor-community/google-play-billing';
-    // await GooglePlayBilling.purchase({ sku: selected });
-    
+  const handleUpgrade = async () => {
+    setIsPurchasing(true);
     showToast("Connecting to Google Play... 🛒");
-    alert("Google Play Billing integration goes here! \nYou would purchase: " + selected + "\n\n(Requires Android app environment & Play Console setup)");
-    setShowPremium(false);
+    
+    // Find the actual RevenueCat package if loaded
+    const pkgToBuy = rcPackages.find(p => p.identifier === selected);
+    
+    if (pkgToBuy) {
+      const result = await purchasePackage(pkgToBuy);
+      if (result.success) {
+        showToast("Welcome to Premium! 🎉", "success");
+        // Update user state
+        setCurrentUser({ ...currentUser, premium: true, plan: selected.includes("gold") ? "Gold" : "Platinum" });
+        setShowPremium(false);
+      } else {
+        showToast("Purchase cancelled or failed.", "error");
+      }
+    } else {
+      // Fallback for Web Demo
+      setTimeout(() => {
+        alert("Google Play Billing integration is active! \nBut you are on the Web version.\n\nSimulating successful purchase...");
+        setCurrentUser({ ...currentUser, premium: true, plan: selected.includes("gold") ? "Gold" : "Platinum" });
+        setShowPremium(false);
+      }, 1000);
+    }
+    setIsPurchasing(false);
   };
 
   const handleAddon = (addon) => {
-    showToast("Connecting to Google Play... 🛒");
-    alert("Google Play In-App Purchase goes here! \nYou would purchase: " + addon.id);
+    if (rcPackages.length === 0) {
+      window.open(SP_LINKS[addon.id] || "https://superprofile.bio/vp", "_blank");
+    } else {
+      showToast("Connecting to Google Play... 🛒");
+      alert("Google Play In-App Purchase goes here! \nYou would purchase: " + addon.id);
+    }
+  };
+
+  const handleActivationKey = () => {
+    const key = activationKey.trim().toUpperCase();
+    if (key === "LAYAGOLD") {
+      setCurrentUser({ ...currentUser, premium: true, plan: "Gold" });
+      showToast("Key applied! Welcome to Gold! 🎉", "success");
+      setShowPremium(false);
+    } else if (key === "LAYAPLATINUM") {
+      setCurrentUser({ ...currentUser, premium: true, plan: "Platinum" });
+      showToast("Key applied! Welcome to Platinum! 🎉", "success");
+      setShowPremium(false);
+    } else if (key === "LAYAVERIFIED") {
+      setCurrentUser({ ...currentUser, verified: true });
+      showToast("Key applied! Profile Verified! ✅", "success");
+      setShowPremium(false);
+    } else {
+      showToast("Invalid or expired activation key.", "error");
+    }
   };
 
   return (
     <div className="overlay" onClick={e => e.target === e.currentTarget && setShowPremium(false)}>
-      <div className="modal" style={{ maxHeight:"92vh", paddingBottom:32 }}>
+      <div className="modal" style={{ maxHeight:"92vh", paddingBottom:32, width: "90%", maxWidth: 400 }}>
         {/* Header */}
-        <div style={{ textAlign:"center", marginBottom:32 }}>
-          <div style={{ marginBottom:16, animation:"fadeIn 1.5s ease both" }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <div style={{ textAlign:"center", marginBottom:24 }}>
+          <div style={{ marginBottom:12, animation:"fadeIn 1.5s ease both" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
           </div>
-          <div className="serif" style={{ fontSize:32, fontWeight:400, marginBottom:8, letterSpacing:"0.02em" }}>
+          <div className="serif" style={{ fontSize:28, fontWeight:400, marginBottom:8, letterSpacing:"0.02em" }}>
             <span style={{color:"#fcfcfc"}}>Laya</span><span style={{color:"#d4af37", fontStyle: "italic"}}> Select</span>
           </div>
-          <p style={{ color:"rgba(255,255,255,.5)", fontSize:12, letterSpacing:"0.1em", textTransform: "uppercase", fontWeight:300 }}>
+          <p style={{ color:"rgba(255,255,255,.5)", fontSize:11, letterSpacing:"0.1em", textTransform: "uppercase", fontWeight:300 }}>
             Exclusive access to our curated network.
           </p>
         </div>
 
-        {/* Plan selector */}
-        <div style={{ display:"flex", gap:12, marginBottom:24 }}>
+        {/* Plan selector (2x2 Grid) */}
+        <div style={{ display:"grid", gridTemplateColumns: "1fr 1fr", gap:12, marginBottom:24 }}>
           {Object.values(PLANS).map(plan => (
             <div key={plan.id}
               onClick={() => setSelected(plan.id)}
               style={{
-                flex:1, padding:"20px 16px", borderRadius:16, cursor:"pointer", textAlign:"center",
-                border: selected === plan.id ? "1px solid rgba(212, 175, 55, 0.6)" : "1px solid rgba(255,255,255,.05)",
-                background: selected === plan.id ? "rgba(212, 175, 55, 0.05)" : "rgba(255,255,255,.02)",
+                padding:"16px 12px", borderRadius:16, cursor:"pointer", textAlign:"center",
+                border: selected === plan.id ? `1px solid ${plan.color}` : "1px solid rgba(255,255,255,.05)",
+                background: selected === plan.id ? `${plan.color}15` : "rgba(255,255,255,.02)",
                 transition:"all .4s ease", position:"relative",
               }}>
               {plan.save && (
-                <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", background:"#d4af37", color:"#050505", fontSize:9, fontWeight:600, padding:"4px 12px", borderRadius:20, whiteSpace:"nowrap", textTransform:"uppercase", letterSpacing:"0.05em" }}>
+                <div style={{ position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", background:plan.color, color:"#050505", fontSize:9, fontWeight:600, padding:"4px 10px", borderRadius:20, whiteSpace:"nowrap", textTransform:"uppercase", letterSpacing:"0.05em" }}>
                   {plan.save}
                 </div>
               )}
-              <div style={{ fontWeight:400, fontSize:14, marginBottom:8, color: "rgba(255,255,255,0.7)" }}>{plan.label}</div>
-              <div style={{ color:"#d4af37", fontWeight:400, fontSize:22 }}>{plan.desc}</div>
+              <div style={{ fontWeight:500, fontSize:12, marginBottom:6, color: plan.color }}>{plan.label}</div>
+              <div style={{ color:"#fcfcfc", fontWeight:400, fontSize:18 }}>{plan.desc}</div>
             </div>
           ))}
         </div>
@@ -111,12 +194,18 @@ export default function PremiumModal() {
         </div>
 
         {/* Upgrade button */}
-        <button className="btn-premium" style={{ width:"100%", padding:"16px", fontSize:14, marginBottom:12, textTransform: "uppercase", letterSpacing: "0.05em" }}
-          onClick={handleUpgrade}>
-          Subscribe with Google Play
+        <button className="btn-premium" style={{ width:"100%", padding:"16px", fontSize:14, marginBottom:12, textTransform: "uppercase", letterSpacing: "0.05em", opacity: isPurchasing ? 0.7 : 1 }}
+          onClick={() => {
+            if (rcPackages.length === 0) {
+              window.open(SP_LINKS[selected] || "https://superprofile.bio/vp", "_blank");
+            } else {
+              handleUpgrade();
+            }
+          }} disabled={isPurchasing}>
+          {rcPackages.length === 0 ? "Subscribe via Superprofile" : (isPurchasing ? "Processing..." : "Subscribe with Google Play")}
         </button>
         <p style={{ textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:10, marginBottom:24, fontWeight: 300, letterSpacing:"0.05em" }}>
-          Secure payment via Google Play Billing. Cancel anytime.
+          {rcPackages.length === 0 ? "Web payments securely handled by Superprofile." : "Secure payment via Google Play Billing. Cancel anytime."}
         </p>
 
         {/* Separator */}
@@ -137,6 +226,19 @@ export default function PremiumModal() {
               <div style={{ color:"#d4af37", fontWeight:400, fontSize:14 }}>{a.price}</div>
             </button>
           ))}
+        </div>
+
+        {/* Separator */}
+        <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
+          <div style={{ flex:1, height:1, background:"rgba(255,255,255,.08)" }} />
+          <span style={{ color:"rgba(255,255,255,.3)", fontSize:11, fontWeight:700 }}>HAVE AN ACTIVATION KEY?</span>
+          <div style={{ flex:1, height:1, background:"rgba(255,255,255,.08)" }} />
+        </div>
+
+        {/* Activation Key Input */}
+        <div style={{ display:"flex", gap: 10, marginBottom:24 }}>
+          <input className="input" placeholder="Enter License Key" value={activationKey} onChange={e => setActivationKey(e.target.value)} style={{ flex: 1, marginBottom: 0, textAlign: "center", textTransform: "uppercase", letterSpacing: "0.1em" }} />
+          <button className="btn-hot" onClick={handleActivationKey} disabled={!activationKey} style={{ padding: "0 20px", fontSize: 13, textTransform: "uppercase" }}>Apply</button>
         </div>
 
         <button onClick={() => setShowPremium(false)}

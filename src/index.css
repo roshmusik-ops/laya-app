@@ -11,8 +11,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
   font-weight: 300;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-#root { min-height: 100vh; }
+#root { min-height: 100vh; overflow-y: auto; overflow-x: hidden; }
+.app-wrap { min-height: 100vh; overflow-y: auto; overflow-x: hidden; }
 img { max-width: 100%; display: block; }
 button { font-family: inherit; }
 a { text-decoration: none; color: inherit; }
@@ -61,6 +64,29 @@ a { text-decoration: none; color: inherit; }
 @keyframes swipeL    { to{transform:translateX(-100%) rotate(-10deg);opacity:0} }
 @keyframes swipeR    { to{transform:translateX(100%) rotate(10deg);opacity:0} }
 
+@keyframes borderOrbit {
+  0%   { transform: rotate(0deg) translateY(-220px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateY(-220px) rotate(-360deg); }
+}
+
+.orbit-heart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  margin-top: -15px;
+  margin-left: -15px;
+  font-size: 24px;
+  pointer-events: none;
+  animation: borderOrbit 12s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 15px rgba(255,45,45,0.8));
+  z-index: 10;
+}
+
 /* ── MARQUEE SLOGAN ──────────────────────────────────────────── */
 @keyframes marqueeScroll {
   0%   { transform: translateX(100%); }
@@ -107,6 +133,21 @@ a { text-decoration: none; color: inherit; }
   background-clip: text;
   animation: shimmer 3s linear infinite;
 }
+
+@keyframes rainbowColors {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.rainbow-text {
+  background: linear-gradient(90deg, #ff2a2a, #ff7a2a, #e6d42e, #2ee64d, #2eaee6, #c22ee6, #ff2a2a);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbowColors 4s linear infinite;
+}
+
 .serif { font-family: var(--font-serif); font-weight: 400; }
 .fade-in { animation: fadeIn .6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 .slide-up { animation: slideUp .5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
@@ -600,3 +641,5 @@ select.input option { background: var(--bg2); color: var(--text); }
   }
 }
 
+
+@media (max-width: 768px) { .desktop-only { display: none !important; } }

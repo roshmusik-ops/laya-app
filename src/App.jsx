@@ -14,6 +14,7 @@ import ChatScreen       from "./screens/ChatScreen";
 import VideoCallScreen  from "./screens/VideoCallScreen";
 import AudioCallScreen  from "./screens/AudioCallScreen";
 import LandingPage      from "./screens/LandingPage";
+import FuturisticOrb    from "./components/FuturisticOrb";
 
 // Components
 import BottomNav         from "./components/BottomNav";
@@ -35,9 +36,9 @@ function SplashScreen() {
     { name: "Meera", age: 24, img: "/fake1.jpg", rotate: -12, top: "5%", left: "2%", duration: "6s" },
     { name: "Sneha", age: 22, img: "/fake2.jpg", rotate: -5, top: "2%", left: "25%", duration: "5s" },
     { name: "Priya", age: 23, img: "/fake3.jpg", rotate: 8, top: "6%", left: "80%", duration: "7s" },
-    { name: "Arundhati", age: 38, img: "/fake4.jpg", rotate: -15, top: "30%", left: "2%", duration: "8s" },
-    { name: "Nandita", age: 45, img: "/fake5.jpg", rotate: 12, top: "35%", left: "85%", duration: "6s" },
-    { name: "Shalini", age: 42, img: "/fake6.jpg", rotate: -8, top: "55%", left: "1%", duration: "7s" },
+    { name: "Arundhati", age: 26, img: "/fake4.jpg", rotate: -15, top: "30%", left: "2%", duration: "8s" },
+    { name: "Nandita", age: 25, img: "/fake5.jpg", rotate: 12, top: "35%", left: "85%", duration: "6s" },
+    { name: "Shalini", age: 24, img: "/fake6.jpg", rotate: -8, top: "55%", left: "1%", duration: "7s" },
     { name: "Divya", age: 26, img: "/fake7.jpg", rotate: 10, top: "60%", left: "88%", duration: "5s" },
     { name: "Kavya", age: 25, img: "/fake8.jpg", rotate: -10, top: "80%", left: "5%", duration: "8s" },
     { name: "Anjali", age: 28, img: "/fake9.jpg", rotate: 5, top: "85%", left: "25%", duration: "6s" },
@@ -73,18 +74,23 @@ function SplashScreen() {
   ];
 
   return (
-    <div className="fade-in" style={{ display:"flex", flexDirection:"column", minHeight:"100vh", position:"relative", overflow:"hidden", background: "linear-gradient(160deg, #0a0000 0%, #2d0505 25%, #1a0000 50%, #3a0a0a 75%, #0a0000 100%)", color: "#fcfcfc" }}>
+    <div className="fade-in" style={{ display:"flex", flexDirection:"column", minHeight:"100vh", position:"relative", overflow:"hidden", backgroundColor: "#020202", color: "#fcfcfc", fontFamily: "system-ui, sans-serif" }}>
       <Helmet>
-        <title>Laya | Where Music Meets Desire</title>
-        <meta name="description" content="Where music meets desire. Find your rhythm, find your match." />
+        <title>Laya | Creative Digital Experience</title>
+        <meta name="description" content="Next generation digital matchmaking experience." />
       </Helmet>
 
-      {/* RED GLOW ORBS — ambient background lighting */}
-      <div className="red-glow-orb" style={{ width: 350, height: 350, top: "5%", left: "-8%", animationDelay: "0s" }} />
-      <div className="red-glow-orb" style={{ width: 300, height: 300, top: "55%", right: "-10%", animationDelay: "-3s" }} />
-      <div className="red-glow-orb" style={{ width: 250, height: 250, top: "35%", left: "45%", animationDelay: "-1.5s", background: "radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%)" }} />
- 
-      {/* ★ BIG PROFILE CARDS — the main attraction, FULL visibility */}
+      {/* 3D WebGL Background */}
+      <FuturisticOrb />
+
+      {/* Rainbow Marquee Announcement */}
+      <div style={{ position: "relative", zIndex: 10, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(10px)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "10px 0", overflow: "hidden", display: "flex", whiteSpace: "nowrap" }}>
+        <div className="slogan-marquee rainbow-text" style={{ fontSize: "12px", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", display: "inline-block" }}>
+          THE FIRST EVER MUSIC BASED DATING APP &nbsp;•&nbsp; FIND YOUR RHYTHM, FIND YOUR MATCH &nbsp;•&nbsp; THE FIRST EVER MUSIC BASED DATING APP &nbsp;•&nbsp; FIND YOUR RHYTHM, FIND YOUR MATCH &nbsp;•&nbsp; THE FIRST EVER MUSIC BASED DATING APP
+        </div>
+      </div>
+
+      {/* ★ BIG PROFILE CARDS — floating around the 3D orb */}
       <div style={{ position: "absolute", inset: 0, zIndex: 1, opacity: 1, overflow: "hidden", pointerEvents: "none" }}>
         {backgroundCards.map((card, idx) => (
           <div key={idx} 
@@ -116,33 +122,25 @@ function SplashScreen() {
       </div>
 
       {/* Floating Elements (Emojis & Crooked Words) */}
-      {floatingElements.map((el, i) => (
-        <span key={i} className="floating-instrument" style={{ 
-          top: el.top, 
-          left: el.left, 
-          fontSize: el.size, 
-          "--duration": el.duration, 
-          fontWeight: 700, 
-          color: "rgba(255, 100, 100, 0.6)", 
-          textShadow: "0 0 20px rgba(255, 45, 45, 0.3)",
-          transform: `rotate(${el.rotate}deg)`,
-          fontFamily: "'Dancing Script', cursive"
-        }}>
-          {el.text}
-        </span>
-      ))}
-
-      {/* FLOWING SVG MUSIC WAVES — 3 layers */}
-      <div className="music-wave-container">
-        <svg viewBox="0 0 120 28" preserveAspectRatio="none" style={{ width: "100%", height: "100%" }}>
-          <path className="music-wave" d="M0 18 Q 15 8, 30 18 T 60 18 T 90 18 T 120 18 T 150 18 T 180 18 T 210 18 T 240 18 L 240 28 L 0 28 Z" 
-            style={{ fill: "rgba(255, 45, 45, 0.35)" }} />
-          <path className="music-wave" d="M0 20 Q 20 10, 40 20 T 80 20 T 120 20 T 160 20 T 200 20 T 240 20 L 240 28 L 0 28 Z" 
-            style={{ animationDelay: "-3s", fill: "rgba(212, 175, 55, 0.2)" }} />
-          <path className="music-wave" d="M0 22 Q 25 14, 50 22 T 100 22 T 150 22 T 200 22 T 240 22 L 240 28 L 0 28 Z" 
-            style={{ animationDelay: "-6s", fill: "rgba(255, 100, 100, 0.2)" }} />
-        </svg>
+      <div style={{ position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none" }}>
+        {floatingElements.map((el, i) => (
+          <span key={i} className="floating-instrument" style={{ 
+            top: el.top, 
+            left: el.left, 
+            fontSize: el.size, 
+            "--duration": el.duration, 
+            fontWeight: 700, 
+            color: "rgba(255, 100, 100, 0.6)", 
+            textShadow: "0 0 20px rgba(255, 45, 45, 0.3)",
+            transform: `rotate(${el.rotate}deg)`,
+            fontFamily: "'Dancing Script', cursive",
+            position: "absolute"
+          }}>
+            {el.text}
+          </span>
+        ))}
       </div>
+
 
       {/* Top Navbar */}
       <header style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 40px", background: "transparent" }}>
@@ -150,7 +148,7 @@ function SplashScreen() {
           <span className="glow-gold">Laya</span>
         </div>
         
-        <nav style={{ display: "flex", gap: 24, fontSize: 13, fontWeight: 500, color: "rgba(255, 255, 255, 0.7)" }}>
+        <nav className="desktop-only" style={{ display: "flex", gap: 24, fontSize: 13, fontWeight: 500, color: "rgba(255, 255, 255, 0.7)" }}>
           <span style={{ cursor: "pointer" }} className="nav-item">Products</span>
           <span style={{ cursor: "pointer" }} className="nav-item">Learn</span>
           <span style={{ cursor: "pointer" }} className="nav-item">Safety</span>
@@ -159,38 +157,44 @@ function SplashScreen() {
 
         {/* Log in Button */}
         <button onClick={() => navigate("/app/discover")}
-          style={{ background: "linear-gradient(135deg, #ff4444, #cc0000)", color: "#fff", border: "none", borderRadius: 24, padding: "9px 26px", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease", boxShadow: "0 4px 15px rgba(255,45,45,0.25)" }}>
+          style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 24, padding: "9px 26px", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s ease" }}>
           Log in
         </button>
       </header>
 
       {/* ★ HERO — Glassmorphism panel over visible profile cards */}
-      <div style={{ position: "relative", zIndex: 3, flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px", marginTop: "12vh" }}>
+      <div style={{ position: "relative", zIndex: 3, flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px", marginTop: "22vh", pointerEvents: "none" }}>
         
         {/* Glass hero panel - Bubble Style */}
         <div style={{ 
           background: "rgba(255, 255, 255, 0.03)", 
-          backdropFilter: "blur(28px)", 
-          WebkitBackdropFilter: "blur(28px)", 
+          backdropFilter: "blur(16px)", 
+          WebkitBackdropFilter: "blur(16px)", 
           border: "1px solid rgba(255,255,255,0.1)", 
           borderRadius: "50% 50% 40% 40%", 
-          padding: "60px 40px 50px", 
-          maxWidth: 480,
+          padding: "60px 50px 50px", 
+          maxWidth: 600,
           boxShadow: "0 20px 60px rgba(0,0,0,0.6), inset 0 0 40px rgba(255,255,255,0.05)",
+          pointerEvents: "auto",
+          position: "relative"
         }}>
+
+          {/* Moving Arrow with Heart */}
+          <div className="orbit-heart">💘</div>
+          
           {/* LAYA Logo with Crooked Stamp */}
-          <div style={{ position: "relative", display: "inline-block", marginBottom: 8 }}>
-            <div className="serif" style={{ fontSize: "80px", fontWeight: 700, letterSpacing: "0.06em", lineHeight: 1 }}>
+          <div style={{ position: "relative", display: "inline-block", marginBottom: 24 }}>
+            <div className="serif" style={{ fontSize: "60px", fontWeight: 700, letterSpacing: "0.06em", lineHeight: 1 }}>
               <span className="glow-gold" style={{ textShadow: "0 0 50px rgba(212,175,55,0.3), 0 0 100px rgba(212,175,55,0.1)" }}>Laya</span>
             </div>
             {/* Crooked word over logo */}
             <div style={{ 
               position: "absolute", 
-              top: "-15px", 
+              top: "-10px", 
               left: "-10px", 
               color: "#ff3c3c", 
               fontFamily: "'Dancing Script', cursive", 
-              fontSize: "26px", 
+              fontSize: "20px", 
               fontWeight: 800, 
               transform: "rotate(-10deg)",
               textShadow: "0 2px 10px rgba(255,45,45,0.4)"
@@ -201,10 +205,10 @@ function SplashScreen() {
             <div style={{ 
               position: "absolute", 
               bottom: "-5px", 
-              right: "-30px", 
+              right: "-20px", 
               color: "#ff3c3c", 
               fontFamily: "'Dancing Script', cursive", 
-              fontSize: "24px", 
+              fontSize: "18px", 
               fontWeight: 800, 
               transform: "rotate(-15deg)",
               textShadow: "0 2px 10px rgba(255,45,45,0.4)"
@@ -213,30 +217,35 @@ function SplashScreen() {
             </div>
           </div>
 
-          {/* Equalizer Visualizer */}
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 40, marginBottom: 14, justifyContent: "center" }}>
-            {eqBars.map((bar, i) => (
-              <div key={i} className="eq-bar" style={{ animation: `${bar.h} ${bar.dur} ease-in-out infinite alternate`, animationDelay: bar.delay }} />
-            ))}
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.3em", color: "#d4af37", textTransform: "uppercase", marginBottom: 16 }}>
+            Powered by WebGL
           </div>
-          
-          {/* MARQUEE SLOGAN */}
-          <div style={{ width: "100%", overflow: "hidden", marginBottom: 24, height: 45 }}>
-            <p className="slogan-marquee" style={{ 
-              color: "#ff6b6b", 
-              fontSize: "28px", 
-              fontFamily: "'Dancing Script', cursive", 
-              fontWeight: 700,
-              textShadow: "0 0 30px rgba(255,45,45,0.4), 0 0 60px rgba(255,45,45,0.15)"
-            }}>
-              🔥 Your vibe attracts your tribe — Let the music decide 🔥
-            </p>
+
+          <h1 style={{ 
+            fontSize: "36px", 
+            fontWeight: 800, 
+            letterSpacing: "-0.02em", 
+            lineHeight: 1.1, 
+            marginBottom: 20,
+            textTransform: "uppercase",
+            color: "#fff",
+            textShadow: "0 0 30px rgba(255,255,255,0.2)"
+          }}>
+            Creative <br/>
+            <span style={{ color: "transparent", WebkitTextStroke: "1px rgba(255,255,255,0.8)" }}>Digital</span> Experience
+          </h1>
+
+          {/* Equalizer Visualizer */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 30, marginBottom: 24, justifyContent: "center", opacity: 0.5 }}>
+            {eqBars.map((bar, i) => (
+              <div key={i} className="eq-bar" style={{ background: "#fff", width: 3, borderRadius: 2, animation: `${bar.h} ${bar.dur} ease-in-out infinite alternate`, animationDelay: bar.delay }} />
+            ))}
           </div>
 
           {/* Subtitle */}
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 28 }}>
-            Where Music Meets Desire
-          </p>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", lineHeight: "1.8", maxWidth: "340px", margin: "0 auto", paddingBottom: "100px" }}>
+              Redefining connections in Kerala with state-of-the-art interactive technology and premium matchmaking.
+            </p>
           
           <button className="btn-hot" 
             onClick={() => navigate("/request-access")}
@@ -250,9 +259,9 @@ function SplashScreen() {
           </button>
 
           {/* Roshmusik Live badge */}
-          <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 8, justifyContent: "center", opacity: 0.5 }}>
+          <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 8, justifyContent: "center", opacity: 0.8 }}>
             <span style={{ fontSize: 14, color: "#1DB954" }}>🎵</span>
-            <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>Powered by Roshmusik Live Tracks</span>
+            <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Powered by Roshmusik Live Tracks</span>
           </div>
         </div>
       </div>
@@ -261,7 +270,10 @@ function SplashScreen() {
       <div style={{ position: "relative", zIndex: 5, padding: "80px 24px", background: "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 20%, rgba(10,0,0,0.95) 100%)" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
           <h2 className="serif" style={{ fontSize: 36, fontWeight: 500, marginBottom: 8, color: "#fff" }}>Membership Plans</h2>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, marginBottom: 48, letterSpacing: "0.05em" }}>Choose your vibe. Upgrade anytime.</p>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, marginBottom: 12, letterSpacing: "0.05em" }}>Choose your vibe. Upgrade anytime.</p>
+          <div style={{ display: "inline-block", background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: "20px", padding: "8px 20px", marginBottom: 48, fontSize: 12, color: "#d4af37", letterSpacing: "0.05em" }}>
+            🔒 Mobile payments use Google Play. Web payments are securely powered by Superprofile.
+          </div>
 
           <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
             {/* FREE */}
@@ -276,6 +288,7 @@ function SplashScreen() {
                 <div>✓ Text chat with matches</div>
                 <div style={{ opacity: 0.3 }}>✕ Audio / Video calls</div>
                 <div style={{ opacity: 0.3 }}>✕ See who liked you</div>
+                <div style={{ opacity: 0.3 }}>✕ Live Sync Room</div>
               </div>
               <button onClick={() => navigate("/request-access")} style={{ marginTop: 24, width: "100%", padding: "12px", borderRadius: 30, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.3s" }}>Get Started</button>
             </div>
@@ -293,8 +306,9 @@ function SplashScreen() {
                 <div>✓ 🎧 Audio calls (mutual consent)</div>
                 <div>✓ Priority matching</div>
                 <div>✓ Roshmusik Live access</div>
+                <div>✓ Live Sync Room (Listen together)</div>
               </div>
-              <button className="btn-premium" onClick={() => navigate("/request-access")} style={{ marginTop: 24, width: "100%", padding: "12px", fontSize: 13 }}>Subscribe Now</button>
+              <button className="btn-premium" onClick={() => window.open('https://superprofile.bio/vp/gold-monthly', '_blank')} style={{ marginTop: 24, width: "100%", padding: "12px", fontSize: 13 }}>Subscribe via Superprofile</button>
             </div>
 
             {/* PLATINUM */}
@@ -311,7 +325,7 @@ function SplashScreen() {
                 <div>✓ Ad-free experience</div>
               </div>
               <div style={{ marginTop: 12, fontSize: 10, color: "rgba(255,255,255,0.3)", fontStyle: "italic", textAlign: "center" }}>Calls only when both users agree</div>
-              <button className="btn-hot" onClick={() => navigate("/request-access")} style={{ marginTop: 24, width: "100%", padding: "12px", fontSize: 13 }}>Go Platinum</button>
+              <button className="btn-hot" onClick={() => window.open('https://superprofile.bio/vp/platinum-monthly', '_blank')} style={{ marginTop: 24, width: "100%", padding: "12px", fontSize: 13 }}>Upgrade via Superprofile</button>
             </div>
           </div>
 
@@ -474,9 +488,9 @@ function TopNav() {
         ))}
       </div>
       {/* Right side */}
-      <div style={{ display:"flex", gap:14, alignItems:"center" }}>
+      <div style={{ display:"flex", gap:14, alignItems:"center", flexShrink: 0 }}>
         <button onClick={() => setShowPremium(true)}
-          style={{ background:"transparent", border:"1px solid rgba(212, 175, 55, 0.3)", borderRadius:20, padding:"6px 12px", fontSize:10, fontWeight:500, color:"#d4af37", cursor:"pointer", textTransform: "uppercase", letterSpacing: "0.05em", transition: "all .3s ease" }}
+          style={{ background:"transparent", border:"1px solid rgba(212, 175, 55, 0.3)", borderRadius:20, padding:"6px 12px", fontSize:10, fontWeight:500, color:"#d4af37", cursor:"pointer", textTransform: "uppercase", letterSpacing: "0.05em", transition: "all .3s ease", flexShrink: 0 }}
           onMouseEnter={e => e.currentTarget.style.background="rgba(212, 175, 55, 0.1)"}
           onMouseLeave={e => e.currentTarget.style.background="transparent"}>
           Member
@@ -490,7 +504,7 @@ function TopNav() {
           )}
         </div>
         <div onClick={() => navigate("/app/profile")}
-          style={{ width:32, height:32, borderRadius:"50%", background:"rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, cursor:"pointer", overflow: "hidden" }}>
+          style={{ width:32, height:32, borderRadius:"50%", background:"rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, cursor:"pointer", overflow: "hidden", flexShrink: 0 }}>
           {currentUser?.photos?.[0] ? <img src={currentUser.photos[0]} alt="Profile" style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
         </div>
       </div>
@@ -500,7 +514,7 @@ function TopNav() {
 
 // ── MAIN APP (after login) ────────────────────────────────────────────────────
 function MainApp() {
-  const { showMatch, showPremium, currentUser } = useApp();
+  const { showMatch, showPremium, currentUser, selectedUser, setSelectedUser } = useApp();
 
   // SECURITY FIX: Prevent unauthenticated users from bypassing the landing page
   if (!currentUser) return <Navigate to="/" replace />;
@@ -525,7 +539,7 @@ function MainApp() {
   }
 
   return (
-    <div className="app-wrap" style={{ paddingBottom:72 }}>
+    <div className="app-wrap" style={{ paddingBottom:72, minHeight:"100vh", overflowY:"auto", overflowX:"hidden", WebkitOverflowScrolling:"touch" }}>
       <TopNav />
       <Routes>
         <Route path="discover" element={<DiscoverTab />} />
@@ -541,6 +555,34 @@ function MainApp() {
       <BottomNav />
       {showMatch   && <MatchCelebration />}
       {showPremium && <PremiumModal />}
+      {selectedUser && (
+        <div className="fade-in" style={{ position:"fixed", inset:0, zIndex:100, background:"#0a0a0a", overflowY:"auto", paddingBottom:80 }}>
+          <div style={{ position:"relative", width:"100%", height: 400 }}>
+            <img src={selectedUser.photos?.[0]} alt="Profile" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+            <button onClick={() => setSelectedUser(null)} style={{ position:"absolute", top:16, right:16, width:40, height:40, borderRadius:"50%", background:"rgba(0,0,0,0.5)", color:"#fff", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontSize: 20 }}>✕</button>
+          </div>
+          <div style={{ padding: 24 }}>
+            <h2 className="serif" style={{ fontSize:32, color:"#d4af37", marginBottom:8 }}>{selectedUser.name}, {selectedUser.age}</h2>
+            <div style={{ color:"rgba(255,255,255,.5)", fontSize:14, marginBottom:24, textTransform:"uppercase", letterSpacing:"0.05em" }}>{selectedUser.district} · {selectedUser.mode}</div>
+            
+            <h3 style={{ fontSize:16, color:"#fff", marginBottom:12 }}>About</h3>
+            <p style={{ color:"rgba(255,255,255,.8)", fontSize:15, lineHeight:1.6, marginBottom:24 }}>{selectedUser.bio}</p>
+            
+            {selectedUser.tags && (
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:24 }}>
+                {selectedUser.tags.map(t => <span key={t} className="tag">{t}</span>)}
+              </div>
+            )}
+            {selectedUser.favoriteTrack && (
+              <div style={{ marginTop: 16, background: "rgba(212, 175, 55, 0.1)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 12, padding: 16 }}>
+                <h4 style={{ color: "#d4af37", fontSize: 13, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.1em" }}>Anthem</h4>
+                <div style={{ color: "#fff", fontSize: 16 }}>{selectedUser.favoriteTrack}</div>
+                <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>by {selectedUser.favoriteArtist}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -561,12 +603,7 @@ export const SONGS = [
   { id: "t1", title:"Nilavin Thennal",   artist:"Roshmusik", url:"/Nilavin_Thennal.mp3",     emoji:"🌙", cover:"/fake1.jpg", duration:"3:45", mood:"Chill", genre:"Lofi" },
   { id: "t2", title:"Kanne Ponmaniye",   artist:"Roshmusik", url:"/Kanne_Ponmaniye.mp3",     emoji:"✨", cover:"/fake2.jpg", duration:"4:10", mood:"Romantic", genre:"Lofi" },
   { id: "t3", title:"Nizhal Variye",     artist:"Roshmusik", url:"/Nizhal_Variye.mp3",       emoji:"👤", cover:"/fake3.jpg", duration:"2:50", mood:"Sad", genre:"Acoustic" },
-  { id: "t4", title:"Poonilaa Veezhukam", artist:"Roshmusik", url:"/Poonilaa_Veezhukam.mp3", emoji:"🎵", cover:"/fake4.jpg", duration:"5:00", mood:"Dreamy", genre:"Lofi" },
-  { id: "t5", title:"Wild Souls",        artist:"Roshmusik", url:"/Wild_Souls.mp3",          emoji:"🔥", cover:"/fake5.jpg", duration:"3:20", mood:"Energetic", genre:"EDM" },
-  { id: "t6", title:"Clear Mind",        artist:"Roshmusik", url:"/Clear_Mind.mp3",          emoji:"🧘", cover:"/fake6.jpg", duration:"4:30", mood:"Peaceful", genre:"Ambient" },
-  { id: "t7", title:"Midnight in Kochi", artist:"Roshmusik", url:"/Midnight_Kochi.mp3",      emoji:"🌃", cover:"/fake7.jpg", duration:"3:15", mood:"Night Vibes", genre:"Chillhop" },
-  { id: "t8", title:"Backwater Dreams",  artist:"Roshmusik", url:"/Backwater_Dreams.mp3",    emoji:"🌊", cover:"/fake8.jpg", duration:"5:20", mood:"Dreamy", genre:"Ambient" },
-  { id: "t9", title:"Theyyam Fire",      artist:"Roshmusik", url:"/Theyyam_Fire.mp3",        emoji:"🔥", cover:"/fake9.jpg", duration:"2:40", mood:"Intense", genre:"Folk Fusion" }
+  { id: "t4", title:"Poonilaa Veezhukam", artist:"Roshmusik", url:"/Poonilaa_Veezhukam.mp3", emoji:"🎵", cover:"/fake4.jpg", duration:"5:00", mood:"Dreamy", genre:"Lofi" }
 ];
 
 function MusicPlayer() {
@@ -612,9 +649,20 @@ function MusicPlayer() {
   // Init audio once
   useEffect(() => {
     audioRef.current = new Audio(song.url);
-    audioRef.current.loop   = true;
     audioRef.current.volume = volume;
     return () => { audioRef.current?.pause(); };
+  }, []);
+
+  // Auto-play next random song when current finishes
+  useEffect(() => {
+    if (!audioRef.current) return;
+    const handleEnded = () => {
+      setSongIdx(Math.floor(Math.random() * SONGS.length));
+      setShowLabel(true);
+      setTimeout(() => setShowLabel(false), 3500);
+    };
+    audioRef.current.addEventListener("ended", handleEnded);
+    return () => audioRef.current?.removeEventListener("ended", handleEnded);
   }, []);
 
   // Change song
@@ -648,7 +696,7 @@ function MusicPlayer() {
 
   const nextSong = (e) => {
     e.stopPropagation();
-    setSongIdx(i => (i + 1) % SONGS.length);
+    setSongIdx(Math.floor(Math.random() * SONGS.length));
     setShowLabel(true);
     setTimeout(() => setShowLabel(false), 3500);
   };
@@ -748,15 +796,7 @@ function Router() {
   if (activeCall?.type === "video") return <VideoCallScreen />;
   if (activeCall?.type === "audio") return <AudioCallScreen />;
 
-  // Waitlist Interceptor
-  if (currentUser?.status === "pending") {
-    return (
-      <Routes>
-        <Route path="/setup" element={<ProfileSetup />} />
-        <Route path="*" element={<WaitlistScreen />} />
-      </Routes>
-    );
-  }
+  // Waitlist removed for testing
 
   return (
     <Routes>

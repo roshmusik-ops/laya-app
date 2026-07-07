@@ -73,8 +73,8 @@ export default function MatchesTab() {
                   <div key={m.id} onClick={() => { setChatUser(m); setActiveTab("chat"); }}
                     style={{ flexShrink:0, textAlign:"center", cursor:"pointer" }}>
                     <div style={{ width:72, height:72, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b,#ffd93d)", padding:2.5, marginBottom:6 }}>
-                      <div style={{ width:"100%", height:"100%", borderRadius:"50%", border:"2.5px solid #080b12", background:"#141828", display:"flex", alignItems:"center", justifyContent:"center", fontSize:30 }}>
-                        {m.photos?.[0] || "👤"}
+                      <div style={{ width:"100%", height:"100%", borderRadius:"50%", border:"2.5px solid #080b12", background:"#141828", display:"flex", alignItems:"center", justifyContent:"center", fontSize:30, overflow:"hidden" }}>
+                        {m.photos?.[0] ? <img src={m.photos[0]} alt={m.name} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
                       </div>
                     </div>
                     <div style={{ fontSize:11, fontWeight:700, maxWidth:68, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{m.name.split(" ")[0]}</div>
@@ -90,8 +90,8 @@ export default function MatchesTab() {
               {newMatches.map(m => (
                 <div key={m.id} className="user-row" onClick={() => { setChatUser(m); setActiveTab("chat"); }}>
                   <div style={{ position:"relative", flexShrink:0 }}>
-                    <div style={{ width:52, height:52, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b33,#ffd93d22)", border:"2px solid rgba(255,107,107,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26 }}>
-                      {m.photos?.[0] || "👤"}
+                    <div style={{ width:52, height:52, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b33,#ffd93d22)", border:"2px solid rgba(255,107,107,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, overflow:"hidden" }}>
+                      {m.photos?.[0] ? <img src={m.photos[0]} alt={m.name} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
                     </div>
                     {m.online && <div style={{ position:"absolute", bottom:1, right:1, width:12, height:12, borderRadius:"50%", background:"#22c55e", border:"2px solid #080b12" }} />}
                   </div>
@@ -128,8 +128,8 @@ export default function MatchesTab() {
               <div key={m.id} className="user-row" style={{ alignItems:"flex-start" }}
                 onClick={() => { setChatUser(m); setActiveTab("chat"); }}>
                 <div style={{ position:"relative", flexShrink:0 }}>
-                  <div style={{ width:52, height:52, borderRadius:"50%", background:"rgba(34,197,94,.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, border:"1px solid rgba(34,197,94,.2)" }}>
-                    {m.photos?.[0] || "👤"}
+                  <div style={{ width:52, height:52, borderRadius:"50%", background:"rgba(34,197,94,.1)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, border:"1px solid rgba(34,197,94,.2)", overflow:"hidden" }}>
+                    {m.photos?.[0] ? <img src={m.photos[0]} alt={m.name} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
                   </div>
                   {m.online && <div style={{ position:"absolute", bottom:1, right:1, width:11, height:11, borderRadius:"50%", background:"#22c55e", border:"2px solid #080b12" }} />}
                 </div>

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, query, onSnapshot, doc, updateDoc, arrayUnion, setDoc, addDoc, serverTimestamp, orderBy, where } from "firebase/firestore";
+import { initRevenueCat } from "../services/revenuecat";
 
 // ─── MOCK DATA ─────────────────────────────────────────────────────────────
 // Keeping mock notifications for now, but users are loaded from Firestore.
@@ -20,32 +21,55 @@ export function AppProvider({ children }) {
   const [appMode, setAppMode]     = useState("date"); // date|friends|network
 
   // ── Current user
-  const [currentUser, setCurrentUser] = useState({
-    id: "demo_user",
-    name: "Guest",
-    age: 26,
-    photos: ["/fake10.jpg"],
-    premium: true,
-    status: "approved"
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem("laya_user");
+    return saved ? JSON.parse(saved) : null;
   });
+
+  // Persist user to localStorage
+  useEffect(() => {
+    if (currentUser) {
+      try {
+        localStorage.setItem("laya_user", JSON.stringify(currentUser));
+      } catch (err) {
+        console.error("Failed to save user to localStorage, possibly due to large photos:", err);
+        // Fallback: Save without the huge data URI photos
+        try {
+          const fallbackUser = { ...currentUser, photos: [] };
+          localStorage.setItem("laya_user", JSON.stringify(fallbackUser));
+        } catch (e2) {
+          console.error("Still failed to save fallback user:", e2);
+        }
+      }
+    } else {
+      localStorage.removeItem("laya_user");
+    }
+  }, [currentUser]);
 
   // ── Users & matching
   const [users, setUsers]             = useState([
-    { id: "u1", name: "Meera", age: 24, district: "Ernakulam", mode: "intimacy", bio: "Looking for someone with great music taste.", photos: ["/fake1.jpg"], favoriteTrack: "Nilavin Thennal" },
-    { id: "u2", name: "Sneha", age: 22, district: "Thrissur", mode: "date", bio: "Coffee and long drives.", photos: ["/fake2.jpg"], favoriteTrack: "Kanne Ponmaniye" },
-    { id: "u3", name: "Priya", age: 23, district: "Kozhikode", mode: "intimacy", bio: "Music is my escape.", photos: ["/fake3.jpg"], favoriteTrack: "Nizhal Variye" },
-    { id: "u4", name: "Arundhati", age: 38, district: "Thiruvananthapuram", mode: "date", bio: "Elegant and classy.", photos: ["/fake4.jpg"], favoriteTrack: "Poonilaa Veezhukam" },
-    { id: "u5", name: "Nandita", age: 45, district: "Ernakulam", mode: "friends", bio: "Looking for genuine connections.", photos: ["/fake5.jpg"], favoriteTrack: "Nilavin Thennal" },
-    { id: "u6", name: "Shalini", age: 42, district: "Palakkad", mode: "intimacy", bio: "Let's vibe.", photos: ["/fake6.jpg"], favoriteTrack: "Kanne Ponmaniye" },
-    { id: "u7", name: "Divya", age: 26, district: "Kannur", mode: "network", bio: "Adventure seeker.", photos: ["/fake7.jpg"], favoriteTrack: "Nizhal Variye" },
-    { id: "u8", name: "Kavya", age: 25, district: "Kottayam", mode: "date", bio: "Simple and sweet.", photos: ["/fake8.jpg"], favoriteTrack: "Poonilaa Veezhukam" },
-    { id: "u9", name: "Anjali", age: 28, district: "Malappuram", mode: "intimacy", bio: "Dog lover.", photos: ["/fake9.jpg"], favoriteTrack: "Nilavin Thennal" }
+    { id: "u1", name: "Meera Nair", age: 24, district: "Ernakulam", mode: "intimacy", bio: "Fashion designer & model. Love cafe hopping in Kochi, sunset drives, and synth-pop vibes.", photos: ["https://keralameet-kquef6rag.vercel.app/girl1.png"], favoriteTrack: "Nilavin Thennal", favoriteArtist: "Shreya Ghoshal", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX10zKzsJ2jva" },
+    { id: "u2", name: "Sneha Kurian", age: 22, district: "Thrissur", mode: "date", bio: "Classical dancer and absolute coffee addict. Let's talk about books over lofi music.", photos: ["https://keralameet-kquef6rag.vercel.app/girl2.png"], favoriteTrack: "Kanne Ponmaniye", favoriteArtist: "K.J. Yesudas", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX4WYHi6zrncH" },
+    { id: "u3", name: "Priya Pillai", age: 23, district: "Kozhikode", mode: "intimacy", bio: "Exploring culinary arts. Music is my escape. Looking for someone with genuine taste.", photos: ["/fake3.jpg"], favoriteTrack: "Nizhal Variye", favoriteArtist: "Sid Sriram", musicLinkType: "YouTube Music", musicLink: "https://music.youtube.com/search?q=malayalam+hits" },
+    { id: "u4", name: "Arundhati Sen", age: 26, district: "Thiruvananthapuram", mode: "date", bio: "Corporate architect. Classy, elegant, and looking for deep late-night conversations.", photos: ["/fake4.jpg"], favoriteTrack: "Poonilaa Veezhukam", favoriteArtist: "Haricharan", musicLinkType: "Apple Music", musicLink: "https://music.apple.com/in/playlist/malayalam-romance" },
+    { id: "u5", name: "Nandita Raj", age: 25, district: "Ernakulam", mode: "friends", bio: "Weekend trekker and shutterbug. Let's curate a shared travel playlist and explore!", photos: ["/fake5.jpg"], favoriteTrack: "Nilavin Thennal", favoriteArtist: "Shreya Ghoshal", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX10zKzsJ2jva" },
+    { id: "u6", name: "Shalini Menon", age: 24, district: "Palakkad", mode: "intimacy", bio: "Vocalist & acoustic music lover. Let's jam to simple acoustic sessions.", photos: ["/fake6.jpg"], favoriteTrack: "Kanne Ponmaniye", favoriteArtist: "Yesudas", musicLinkType: "Soundcloud", musicLink: "https://soundcloud.com/discover" },
+    { id: "u7", name: "Adarsh G. Nair", age: 26, district: "Ernakulam", mode: "network", bio: "Software engineer at Infopark. Rock music, gym, and side-hustle builder. Let's connect!", photos: ["https://keralameet-kquef6rag.vercel.app/boy1.png"], favoriteTrack: "Starboy", favoriteArtist: "The Weeknd", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/artist/1XyoP6uDi7UIv7mq3w716g" },
+    { id: "u8", name: "Jithin Joseph", age: 24, district: "Thrissur", mode: "friends", bio: "Football fan and amateur guitarist. Looking for football/sports buddies in Thrissur.", photos: ["/fake8.jpg"], favoriteTrack: "Kanne Ponmaniye", favoriteArtist: "Yesudas", musicLinkType: "YouTube Music", musicLink: "https://music.youtube.com/search?q=malayalam+rock" },
+    { id: "u9", name: "Gautham Krishna", age: 27, district: "Kozhikode", mode: "date", bio: "Freelance travel photographer. Capturing frames and listening to vintage Malayalam hits.", photos: ["/fake9.jpg"], favoriteTrack: "Poonilaa Veezhukam", favoriteArtist: "K.S. Chithra", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX3SpV5aU3e3K" },
+    { id: "u10", name: "Appu Mathew", age: 23, district: "Kottayam", mode: "friends", bio: "Food blogger and off-road driving enthusiast. Let's find the best local eateries!", photos: ["/fake7.jpg"], favoriteTrack: "Nizhal Variye", favoriteArtist: "Sid Sriram", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX10zKzsJ2jva" },
+    { id: "u11", name: "Midhun Lal", age: 25, district: "Alappuzha", mode: "intimacy", bio: "Backwater lover & houseboater. Looking for someone to share long sunset walks.", photos: ["/fake2.jpg"], favoriteTrack: "Nilavin Thennal", favoriteArtist: "Shreya Ghoshal", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX10zKzsJ2jva" },
+    { id: "u12", name: "Rahul Varma", age: 28, district: "Ernakulam", mode: "network", bio: "Startup founder working on AI. Love networking over black coffee.", photos: ["https://randomuser.me/api/portraits/men/32.jpg"], favoriteTrack: "Starboy", favoriteArtist: "The Weeknd", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/artist/1XyoP6uDi7UIv7mq3w716g" },
+    { id: "u13", name: "Vishnu Prasad", age: 26, district: "Thiruvananthapuram", mode: "date", bio: "Cinematographer and movie buff. Looking for my co-star.", photos: ["https://randomuser.me/api/portraits/men/44.jpg"], favoriteTrack: "Nizhal Variye", favoriteArtist: "Sid Sriram", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX10zKzsJ2jva" },
+    { id: "u14", name: "Akhil Nair", age: 25, district: "Kollam", mode: "friends", bio: "Rider. Weekends are for long rides to Varkala. Need a pillion rider or fellow bikers.", photos: ["https://randomuser.me/api/portraits/men/46.jpg"], favoriteTrack: "Poonilaa Veezhukam", favoriteArtist: "Haricharan", musicLinkType: "YouTube Music", musicLink: "https://music.youtube.com/search?q=malayalam+hits" },
+    { id: "u15", name: "Gopika Krishnan", age: 24, district: "Thrissur", mode: "date", bio: "Classical dancer. Deeply rooted in tradition but modern at heart.", photos: ["https://randomuser.me/api/portraits/women/44.jpg"], favoriteTrack: "Kanne Ponmaniye", favoriteArtist: "K.J. Yesudas", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX4WYHi6zrncH" },
+    { id: "u16", name: "Ananya Menon", age: 23, district: "Kochi", mode: "intimacy", bio: "Architect by day, artist by night. Let's paint the town red.", photos: ["https://randomuser.me/api/portraits/women/46.jpg"], favoriteTrack: "Nilavin Thennal", favoriteArtist: "Shreya Ghoshal", musicLinkType: "Spotify", musicLink: "https://open.spotify.com/playlist/37i9dQZF1DX10zKzsJ2jva" }
   ]);
   const [swipedIds, setSwipedIds]     = useState([]);
   const [likedIds, setLikedIds]       = useState([]);
   const [matches, setMatches]         = useState([
-    { id: "u1", name: "Meera", photos: ["/fake1.jpg"], lastMessage: "Hey!" },
-    { id: "u2", name: "Sneha", photos: ["/fake2.jpg"], lastMessage: "Loved your music taste" }
+    { id: "u1", name: "Meera", photos: ["/fake1.jpg"], lastMessage: "Hey!", expiresAt: Date.now() + 86400000 },
+    { id: "u2", name: "Sneha", photos: ["/fake2.jpg"], lastMessage: "Loved your music taste", expiresAt: Date.now() + 86400000 }
   ]);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -95,6 +119,11 @@ export function AppProvider({ children }) {
     //    }
     // });
     // return () => unsub();
+
+    // Initialize RevenueCat for native payments
+    if (currentUser?.id) {
+      initRevenueCat(currentUser.id);
+    }
   }, [currentUser?.id]);
 
   // ── Splash → auth transition now handled by React Router in App.jsx
@@ -109,7 +138,10 @@ export function AppProvider({ children }) {
   const handleSwipeRight = async (user) => {
     if (!currentUser?.id) return;
     
-    // Check for match before updating DB
+    // Optimistic local update so swiping works immediately
+    setSwipedIds(prev => [...prev, user.id]);
+
+    // Check for match
     const isMatch = (user.likedIds || []).includes(currentUser.id);
     const matchData = {
       ...user,
@@ -117,56 +149,26 @@ export function AppProvider({ children }) {
       expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
       firstMessageSent: false,
     };
-    
-    const myMatchData = {
-      ...currentUser,
-      matchedAt: Date.now(),
-      expiresAt: Date.now() + 24 * 60 * 60 * 1000,
-      firstMessageSent: false,
-    };
 
-    try {
-      if (isMatch) {
-        // It's a match! Update both users in Firestore
-        await updateDoc(doc(db, "users", currentUser.id), {
-          swipedIds: arrayUnion(user.id),
-          likedIds: arrayUnion(user.id),
-          matches: arrayUnion(matchData)
-        });
-        await updateDoc(doc(db, "users", user.id), {
-          matches: arrayUnion(myMatchData)
-        });
-        
-        setMatchedUser(matchData);
-        setShowMatch(true);
-        setNotifications(p => [
-          { id: `n${Date.now()}`, text: `You matched with ${user.name}! 🎉`, time: "just now", read: false, type: "match" },
-          ...p
-        ]);
-      } else {
-        // Just a like, record it
-        await updateDoc(doc(db, "users", currentUser.id), {
-          swipedIds: arrayUnion(user.id),
-          likedIds: arrayUnion(user.id)
-        });
-        showToast(`Connect request sent to ${user.name}!`);
-      }
-    } catch (err) {
-      console.error(err);
-      showToast("Error recording swipe", "error");
+    if (isMatch) {
+      setMatchedUser(matchData);
+      setShowMatch(true);
+      setNotifications(p => [
+        { id: `n${Date.now()}`, text: `You matched with ${user.name}! 🎉`, time: "just now", read: false, type: "match" },
+        ...p
+      ]);
+      setMatches(prev => [...prev, matchData]);
+    } else {
+      showToast(`Connect request sent to ${user.name}!`);
     }
   };
 
   // ── Handle swipe left (pass)
   const handleSwipeLeft = async (user) => {
     if (!currentUser?.id) return;
-    try {
-      await updateDoc(doc(db, "users", currentUser.id), {
-        swipedIds: arrayUnion(user.id)
-      });
-    } catch (err) {
-      console.error(err);
-    }
+    
+    // Optimistic local update
+    setSwipedIds(prev => [...prev, user.id]);
   };
 
   // ── Send message
@@ -179,23 +181,16 @@ export function AppProvider({ children }) {
     // Mark first message sent on match locally
     setMatches(p => p.map(m => m.id === userId ? { ...m, firstMessageSent: true } : m));
     
-    try {
-      // Create a unique chat ID based on the two users
-      const chatId = [currentUser.id, userId].sort().join("_");
-      
-      await addDoc(collection(db, "chats", chatId, "messages"), {
+    // Bypass Firebase messaging
+    setMessages(prev => ({
+      ...prev,
+      [userId]: [...(prev[userId] || []), {
+        id: "msg_" + Date.now(),
         text,
-        senderId: currentUser.id,
-        receiverId: userId,
-        timestamp: serverTimestamp(),
-      });
-      
-      // Update match document (firstMessageSent) if needed
-      // For simplicity in v2, we are just saving the message.
-    } catch (err) {
-      console.error("Error sending message:", err);
-      showToast("Message failed to send", "error");
-    }
+        from: "me",
+        time: new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })
+      }]
+    }));
   };
   
   // ── Firebase Sync (Real-time Chat) ──

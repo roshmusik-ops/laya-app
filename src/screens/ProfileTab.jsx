@@ -43,11 +43,31 @@ export default function ProfileTab() {
         </div>
         <div style={{ display:"flex", justifyContent:"center", gap:6, flexWrap:"wrap" }}>
           {(currentUser.tags || []).map(t => <span key={t} className="tag">{t}</span>)}
-          {currentUser.premium
-            ? <span className="premium-badge">⭐ Premium</span>
-            : <span style={{ display:"inline-block", background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"#aaa", borderRadius:20, padding:"3px 11px", fontSize:11, fontWeight:700 }}>Free Plan</span>}
         </div>
       </div>
+
+      {/* Membership Card */}
+      {currentUser.premium ? (
+        <div style={{ background: currentUser.plan === "Platinum" ? "rgba(255,255,255,0.05)" : "linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(184, 134, 11, 0.05))", border: currentUser.plan === "Platinum" ? "1px solid rgba(255,80,80,0.3)" : "1px solid rgba(212, 175, 55, 0.3)", borderRadius:16, padding:"16px", marginBottom:20, display:"flex", alignItems:"center", justifyContent:"space-between", boxShadow:"0 8px 32px rgba(0,0,0,0.3)" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+            <div style={{ width:48, height:48, borderRadius:"50%", background: currentUser.plan === "Platinum" ? "linear-gradient(135deg, #ff6b6b, #ff4757)" : "linear-gradient(135deg, #d4af37, #b8860b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, boxShadow: currentUser.plan === "Platinum" ? "0 4px 12px rgba(255,107,107, 0.3)" : "0 4px 12px rgba(212, 175, 55, 0.3)" }}>👑</div>
+            <div>
+              <div style={{ color: currentUser.plan === "Platinum" ? "#ff6b6b" : "#d4af37", fontSize:16, fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase" }}>{currentUser.plan || "Gold"} Member</div>
+              <div style={{ color:"rgba(255,255,255,0.6)", fontSize:12, marginTop:2, fontWeight: 300 }}>Active Subscription</div>
+            </div>
+          </div>
+          <div style={{ textAlign:"right" }}>
+            <div style={{ color:"#fcfcfc", fontSize:20, fontWeight:700 }}>29</div>
+            <div style={{ color: currentUser.plan === "Platinum" ? "rgba(255,107,107, 0.8)" : "rgba(212, 175, 55, 0.8)", fontSize:10, textTransform:"uppercase", letterSpacing:"0.05em", fontWeight: 700 }}>Days Left</div>
+          </div>
+        </div>
+      ) : (
+        <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.07)", borderRadius:16, padding:"16px", marginBottom:20, textAlign:"center" }}>
+          <div style={{ color:"rgba(255,255,255,0.8)", fontSize:14, fontWeight:500, marginBottom:4 }}>Free Plan</div>
+          <div style={{ color:"rgba(255,255,255,0.4)", fontSize:12, marginBottom:12 }}>Upgrade to connect directly with matches.</div>
+          <button onClick={() => setShowPremium(true)} style={{ background:"linear-gradient(135deg, #d4af37, #b8860b)", border:"none", borderRadius:20, padding:"8px 20px", color:"#fff", fontWeight:700, fontSize:12, cursor:"pointer" }}>UPGRADE NOW</button>
+        </div>
+      )}
 
       {/* Photos grid */}
       <div style={{ marginBottom:18 }}>
@@ -86,7 +106,8 @@ export default function ProfileTab() {
           { label:"WhatsApp",   value: currentUser.whatsapp   },
           { label:"Looking For",value: currentUser.lookingFor },
           { label:"Bio",        value: currentUser.bio || "No bio yet" },
-          { label:"Favorite Track / Anthem", value: currentUser.favoriteTrack ? `🎵 ${currentUser.favoriteTrack} by ${currentUser.favoriteArtist}` : "Not set" }
+          { label:"Favorite Track / Anthem", value: currentUser.favoriteTrack ? `🎵 ${currentUser.favoriteTrack} by ${currentUser.favoriteArtist}` : "Not set" },
+          { label:"Connected Music Channel", value: currentUser.musicLink ? `🎧 ${currentUser.musicLinkType}: ${currentUser.musicLink}` : "Not set" }
         ].map(item => (
           <div key={item.label} style={{ marginBottom:10, paddingBottom:10, borderBottom:"1px solid rgba(255,255,255,.04)" }}>
             <div style={{ color:"rgba(255,255,255,.3)", fontSize:10, fontWeight:700, marginBottom:2 }}>{item.label}</div>
@@ -115,7 +136,7 @@ export default function ProfileTab() {
       {!currentUser.premium && (
         <button className="btn-red" style={{ width:"100%", padding:"15px", fontSize:15, marginBottom:10 }}
           onClick={() => setShowPremium(true)}>
-          ⭐ Upgrade to Laya Premium — ₹29/month
+          ⭐ Upgrade to Laya Premium
         </button>
       )}
 

@@ -73,6 +73,46 @@ export default function AdminDashboard() {
         status: "approved",
         favoriteTrack: "After Hours",
         favoriteArtist: "The Weeknd"
+      },
+      {
+        id: "arun_varghese",
+        name: "Arun Varghese",
+        age: 31,
+        district: "Thiruvananthapuram",
+        bio: "Senior Architect working in Trivandrum. Genuine, easy-going, and passionate about minimal design and late-night drives. Looking for a real connection.",
+        photos: ["https://keralameet-kquef6rag.vercel.app/boy1.png", "", "", ""],
+        tags: ["Design", "Travel", "Movies"],
+        gender: "Male",
+        lookingFor: "Romantic Connection",
+        verified: true,
+        premium: true,
+        online: true,
+        whatsapp: "+919988776655",
+        mode: "date",
+        joined: new Date().toISOString(),
+        status: "approved",
+        favoriteTrack: "Sky Full of Stars",
+        favoriteArtist: "Coldplay"
+      },
+      {
+        id: "priya_fake_age",
+        name: "Priya Nair",
+        age: 45,
+        district: "Ernakulam",
+        bio: "Entered my birth year wrong, I am actually 24! 😂 Love cafe hopping, styling, and meeting new people.",
+        photos: ["https://keralameet-kquef6rag.vercel.app/girl1.png", "", "", ""],
+        tags: ["Fashion", "Foodie", "Fun"],
+        gender: "Female",
+        lookingFor: "Friends & Social Circle",
+        verified: false,
+        premium: false,
+        online: true,
+        whatsapp: "+918877665544",
+        mode: "friends",
+        joined: new Date().toISOString(),
+        status: "approved",
+        favoriteTrack: "Espresso",
+        favoriteArtist: "Sabrina Carpenter"
       }
     ];
 
