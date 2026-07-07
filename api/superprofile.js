@@ -20,17 +20,41 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body;
-    console.log("Received Webhook from Superprofile:", body);
+    console.log("Received Webhook from Superprofile:", JSON.stringify(body));
 
     // Superprofile webhooks usually send data inside a "data" object
     const payload = body.data || body;
-    
-    // Extract the customer email
-    const email = payload.customer_email || payload.email || payload.customer?.email;
+
+    // Helper: extract email from text using regex
+    const extractEmailFromText = (text) => {
+      if (!text) return null;
+      const match = String(text).match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+      return match ? match[0] : null;
+    };
+
+    // Extract the customer email — try direct fields first, then parse from email body
+    let email = payload.customer_email
+      || payload.email
+      || payload.customer?.email;
+
+    // If coming from Gmail notification (Make.com Gmail trigger path),
+    // the "from" field is Superprofile's address — extract buyer email from body text
+    if (!email || email.includes('superprofile') || email.includes('noreply') || email.includes('no-reply')) {
+      email = extractEmailFromText(payload.body) || extractEmailFromText(payload.subject) || null;
+    }
+
+    console.log("Resolved customer email:", email);
 
     if (!email) {
-      return res.status(400).json({ message: 'No email found in webhook payload.' });
+      return res.status(400).json({ message: 'No customer email found in payload.' });
     }
+
+    // Detect plan from product name / subject
+    const productName = (payload.product_name || payload.subject || '').toLowerCase();
+    let plan = 'Gold';
+    let durationDays = 30;
+    if (productName.includes('platinum')) { plan = 'Platinum'; durationDays = 30; }
+    else if (productName.includes('gold')) { plan = 'Gold'; durationDays = 30; }
 
     // Connect to Firestore
     const db = admin.firestore();
@@ -44,14 +68,11 @@ export default async function handler(req, res) {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Determine what they bought
-    // For now, we will default to granting 30 Days of Gold
-    // You can customize this by checking `payload.product_name` or `payload.plan`
     const now = Date.now();
     const updates = {
       premium: true,
-      premiumUntil: now + 30 * 24 * 60 * 60 * 1000, // 30 Days
-      plan: "Gold"
+      premiumUntil: now + durationDays * 24 * 60 * 60 * 1000,
+      plan
     };
 
     // Update all matching user documents (usually just one)
