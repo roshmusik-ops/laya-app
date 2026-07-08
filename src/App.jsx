@@ -245,25 +245,27 @@ function SplashScreen() {
           </div>
 
           {/* Subtitle */}
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", lineHeight: "1.8", maxWidth: "340px", margin: "0 auto", paddingBottom: "100px" }}>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", lineHeight: "1.8", maxWidth: "340px", margin: "0 auto", paddingBottom: "30px" }}>
               Redefining connections in Kerala with state-of-the-art interactive technology and premium matchmaking.
             </p>
-          
-          <button className="btn-hot" 
-            onClick={() => navigate("/request-access")}
-            style={{
-              padding: "16px 48px",
-              fontSize: "15px",
-              width: "100%",
-              maxWidth: 300,
-            }}>
-            Create account
-          </button>
+
+          <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+            <button className="btn-hot" 
+              onClick={() => navigate("/request-access")}
+              style={{
+                padding: "16px 48px",
+                fontSize: "15px",
+                width: "100%",
+                maxWidth: 300,
+              }}>
+              Create account
+            </button>
+          </div>
 
           {/* Roshmusik Live badge */}
-          <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 8, justifyContent: "center", opacity: 0.8 }}>
+          <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 8, justifyContent: "center", opacity: 0.8 }}>
             <span style={{ fontSize: 14, color: "#1DB954" }}>🎵</span>
-            <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Powered by Roshmusik Live Tracks</span>
+            <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(255,255,255,0.9)" }}>Powered by Roshmusik Live Tracks</span>
           </div>
         </div>
       </div>
