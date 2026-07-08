@@ -873,8 +873,8 @@ function Router() {
 
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/network/:location/:niche" element={<LandingPage />} />
+      <Route path="/" element={<SplashScreen />} />
+      <Route path="/network/:location/:niche" element={<SplashScreen />} />
       <Route path="/request-access" element={<AuthScreen />} />
       <Route path="/setup" element={<ProfileSetup />} />
       <Route path="/app/*" element={<MainApp />} />
