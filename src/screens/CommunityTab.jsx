@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../contexts/AppContext";
+import ScrollReveal from "../components/ScrollReveal";
 
 const DISTRICT_GROUPS = [
   { id:"ekm",  name:"Ernakulam",       icon:"🏙️", members:1240 },
@@ -89,31 +90,33 @@ export default function CommunityTab() {
           </div>
 
           {/* Posts */}
-          {posts.map(post => (
-            <div key={post.id} style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", borderRadius:16, padding:"14px 16px", marginBottom:10 }}>
-              <div style={{ display:"flex", gap:10, marginBottom:10 }}>
-                <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0, overflow:"hidden" }}>
-                  {post.avatar?.length > 4 ? <img src={post.avatar} alt="avatar" style={{width:"100%", height:"100%", objectFit:"cover"}}/> : post.avatar}
+          {posts.map((post, i) => (
+            <ScrollReveal key={post.id} animation="slideUp" delay={i * 0.1}>
+              <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", borderRadius:16, padding:"14px 16px", marginBottom:10 }}>
+                <div style={{ display:"flex", gap:10, marginBottom:10 }}>
+                  <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0, overflow:"hidden" }}>
+                    {post.avatar?.length > 4 ? <img src={post.avatar} alt="avatar" style={{width:"100%", height:"100%", objectFit:"cover"}}/> : post.avatar}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight:800, fontSize:13 }}>{post.user}</div>
+                    <div style={{ color:"rgba(255,255,255,.35)", fontSize:11 }}>📍 {post.district} · {post.time}</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontWeight:800, fontSize:13 }}>{post.user}</div>
-                  <div style={{ color:"rgba(255,255,255,.35)", fontSize:11 }}>📍 {post.district} · {post.time}</div>
+                <p style={{ fontSize:14, lineHeight:1.6, color:"rgba(255,255,255,.85)", marginBottom:12 }}>{post.text}</p>
+                <div style={{ display:"flex", gap:16 }}>
+                  <button onClick={() => handleLike(post.id)}
+                    style={{ background:"none", border:"none", color: likedPosts.includes(post.id) ? "#ff6b6b" : "rgba(255,255,255,.4)", cursor:"pointer", fontSize:13, fontWeight:700, display:"flex", alignItems:"center", gap:5 }}>
+                    {likedPosts.includes(post.id) ? "❤️" : "🤍"} {post.likes}
+                  </button>
+                  <button style={{ background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:13, fontWeight:700, display:"flex", alignItems:"center", gap:5 }}>
+                    💬 {post.comments}
+                  </button>
+                  <button style={{ background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:13, fontWeight:700, marginLeft:"auto", display:"flex", alignItems:"center", gap:5 }}>
+                    ↗️ Share
+                  </button>
                 </div>
               </div>
-              <p style={{ fontSize:14, lineHeight:1.6, color:"rgba(255,255,255,.85)", marginBottom:12 }}>{post.text}</p>
-              <div style={{ display:"flex", gap:16 }}>
-                <button onClick={() => handleLike(post.id)}
-                  style={{ background:"none", border:"none", color: likedPosts.includes(post.id) ? "#ff6b6b" : "rgba(255,255,255,.4)", cursor:"pointer", fontSize:13, fontWeight:700, display:"flex", alignItems:"center", gap:5 }}>
-                  {likedPosts.includes(post.id) ? "❤️" : "🤍"} {post.likes}
-                </button>
-                <button style={{ background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:13, fontWeight:700, display:"flex", alignItems:"center", gap:5 }}>
-                  💬 {post.comments}
-                </button>
-                <button style={{ background:"none", border:"none", color:"rgba(255,255,255,.4)", cursor:"pointer", fontSize:13, fontWeight:700, marginLeft:"auto", display:"flex", alignItems:"center", gap:5 }}>
-                  ↗️ Share
-                </button>
-              </div>
-            </div>
+            </ScrollReveal>
           ))}
         </>
       )}
@@ -121,15 +124,17 @@ export default function CommunityTab() {
       {/* ── GROUPS ── */}
       {view === "groups" && (
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-          {DISTRICT_GROUPS.map(g => (
-            <div key={g.id} className="card" style={{ padding:"16px 14px" }} onClick={() => showToast(`Opening ${g.name} group...`)}>
-              <div style={{ fontSize:28, marginBottom:8 }}>{g.icon}</div>
-              <div style={{ fontWeight:800, fontSize:13, marginBottom:3 }}>{g.name}</div>
-              <div style={{ color:"#ff6b6b", fontWeight:700, fontSize:12 }}>{g.members.toLocaleString()} members</div>
-              <button className="btn-red" style={{ marginTop:10, padding:"6px 14px", fontSize:11, width:"100%" }}>
-                Join Group
-              </button>
-            </div>
+          {DISTRICT_GROUPS.map((g, i) => (
+            <ScrollReveal key={g.id} animation="popIn" delay={(i % 2) * 0.1}>
+              <div className="card" style={{ padding:"16px 14px", height:"100%" }} onClick={() => showToast(`Opening ${g.name} group...`)}>
+                <div style={{ fontSize:28, marginBottom:8 }}>{g.icon}</div>
+                <div style={{ fontWeight:800, fontSize:13, marginBottom:3 }}>{g.name}</div>
+                <div style={{ color:"#ff6b6b", fontWeight:700, fontSize:12 }}>{g.members.toLocaleString()} members</div>
+                <button className="btn-red" style={{ marginTop:10, padding:"6px 14px", fontSize:11, width:"100%" }}>
+                  Join Group
+                </button>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       )}
