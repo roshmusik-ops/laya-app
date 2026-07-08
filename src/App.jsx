@@ -22,6 +22,7 @@ import FuturisticOrb    from "./components/FuturisticOrb";
 import BottomNav         from "./components/BottomNav";
 import MatchCelebration  from "./components/MatchCelebration";
 import PremiumModal      from "./components/PremiumModal";
+import FloatingBeats     from "./components/FloatingBeats";
 
 // Inline screens (small enough to keep here)
 import NotificationsTab  from "./screens/NotificationsTab";
@@ -629,6 +630,7 @@ function MainApp() {
         <Route path="*" element={<Navigate to="discover" replace />} />
       </Routes>
       <BottomNav />
+      {!isNative && <FloatingBeats />}
       {showMatch   && <MatchCelebration />}
       {showPremium && <PremiumModal />}
       {selectedUser && (
