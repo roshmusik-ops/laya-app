@@ -41,8 +41,8 @@ export default function ChatScreen() {
       <div style={{ padding:"12px 16px", borderBottom:"1px solid rgba(255,255,255,.06)", display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
         <button onClick={() => setActiveTab("matches")}
           style={{ background:"none", border:"none", color:"rgba(255,255,255,.5)", fontSize:20, cursor:"pointer", padding:"0 4px" }}>←</button>
-        <div style={{ width:40, height:40, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, border:"1px solid rgba(255,107,107,.2)" }}>
-          {chatUser.photos?.[0] || "👤"}
+        <div style={{ width:40, height:40, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, border:"1px solid rgba(255,107,107,.2)", overflow:"hidden" }}>
+          {chatUser.photos?.[0] ? <img src={chatUser.photos[0]} alt={chatUser.name} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
         </div>
         <div style={{ flex:1 }}>
           <div style={{ fontWeight:800, fontSize:14 }}>{chatUser.name}</div>
