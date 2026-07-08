@@ -541,7 +541,8 @@ function MainApp() {
     }
 
     try {
-      await updateDoc(doc(db, "users", currentUser.uid), updates);
+      const userId = currentUser.uid || currentUser.id;
+      await updateDoc(doc(db, "users", userId), updates);
       setCurrentUser({ ...currentUser, ...updates });
       setShowKeyInput(false);
       setActivationKey("");
