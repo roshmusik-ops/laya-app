@@ -24,6 +24,7 @@ import BottomNav         from "./components/BottomNav";
 import MatchCelebration  from "./components/MatchCelebration";
 import PremiumModal      from "./components/PremiumModal";
 import FloatingBeats     from "./components/FloatingBeats";
+import ParticleField     from "./components/ParticleField";
 
 // Inline screens (small enough to keep here)
 import NotificationsTab  from "./screens/NotificationsTab";
@@ -617,7 +618,8 @@ function MainApp() {
 
 
   return (
-    <div className="app-wrap" style={{ paddingBottom:72, minHeight:"100vh", overflowY:"auto", overflowX:"hidden", WebkitOverflowScrolling:"touch" }}>
+    <div className="app-wrap" style={{ paddingBottom:72, minHeight:"100vh", overflowY:"auto", overflowX:"hidden", WebkitOverflowScrolling:"touch", position:"relative" }}>
+      <ParticleField />
       <TopNav />
       <Routes>
         <Route path="discover" element={<DiscoverTab />} />

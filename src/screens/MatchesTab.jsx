@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../contexts/AppContext";
+import ScrollReveal from "../components/ScrollReveal";
 
 function Timer({ expiresAt }) {
   const [remaining, setRemaining] = useState("");
@@ -89,8 +90,9 @@ export default function MatchesTab() {
               <p style={{ color:"rgba(255,255,255,.35)", fontSize:11, fontWeight:700, letterSpacing:1.5, margin:"16px 0 10px" }}>
                 SAY HELLO FIRST!
               </p>
-              {newMatches.map(m => (
-                <div key={m.id} className="user-row" onClick={() => { setChatUser(m); navigate("/app/chat"); }}>
+              {newMatches.map((m, i) => (
+                <ScrollReveal key={m.id} animation="slideUp" delay={i * 0.08}>
+                <div className="user-row" onClick={() => { setChatUser(m); navigate("/app/chat"); }}>
                   <div style={{ position:"relative", flexShrink:0 }}>
                     <div style={{ width:52, height:52, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b33,#ffd93d22)", border:"2px solid rgba(255,107,107,.3)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, overflow:"hidden" }}>
                       {m.photos?.[0] ? <img src={m.photos[0]} alt={m.name} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
@@ -109,6 +111,7 @@ export default function MatchesTab() {
                     </button>
                   </div>
                 </div>
+                </ScrollReveal>
               ))}
             </>
           )}
