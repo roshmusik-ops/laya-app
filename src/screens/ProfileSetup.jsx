@@ -100,18 +100,18 @@ export default function ProfileSetup() {
         status: "approved"
       };
       
-      // Bypass Firebase entirely to prevent hanging
-      setTimeout(() => {
-        setCurrentUser(updated);
-        setLoading(false);
-        navigate("/app");
-        showToast(`Profile ready, ${updated.name || "friend"}! Welcome to Laya 🎉`);
-      }, 500);
+      // Save to Firestore so the account is permanent!
+      await setDoc(doc(db, "users", uid), updated);
+      
+      setCurrentUser(updated);
+      setLoading(false);
+      navigate("/app");
+      showToast(`Profile ready, ${updated.name || "friend"}! Welcome to Laya 🎉`);
       
     } catch (err) {
       console.error(err);
       setLoading(false);
-      showToast("Error saving profile", "error");
+      showToast("Error saving profile to database", "error");
     }
   };
 
