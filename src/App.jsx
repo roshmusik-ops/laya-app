@@ -37,14 +37,14 @@ function SplashScreen() {
   const backgroundCards = [
     { name: "Meera", age: 24, img: "/girl1.png", rotate: -12, top: "5%", left: "2%", duration: "6s" },
     { name: "Sneha", age: 22, img: "/sneha.png", rotate: -5, top: "2%", left: "25%", duration: "5s" },
-    { name: "Priya", age: 23, img: "/fake3.jpg", rotate: 8, top: "6%", left: "80%", duration: "7s" },
-    { name: "Arundhati", age: 26, img: "/fake4.jpg", rotate: -15, top: "30%", left: "2%", duration: "8s" },
-    { name: "Nandita", age: 25, img: "/fake5.jpg", rotate: 12, top: "35%", left: "85%", duration: "6s" },
-    { name: "Shalini", age: 24, img: "/fake6.jpg", rotate: -8, top: "55%", left: "1%", duration: "7s" },
-    { name: "Divya", age: 26, img: "/fake7.jpg", rotate: 10, top: "60%", left: "88%", duration: "5s" },
-    { name: "Kavya", age: 25, img: "/fake8.jpg", rotate: -10, top: "80%", left: "5%", duration: "8s" },
-    { name: "Anjali", age: 28, img: "/fake9.jpg", rotate: 5, top: "85%", left: "25%", duration: "6s" },
-    { name: "Riya", age: 23, img: "/fake10.jpg", rotate: -12, top: "82%", left: "75%", duration: "7s" }
+    { name: "Priya", age: 23, img: "/priya.png", rotate: 8, top: "6%", left: "80%", duration: "7s" },
+    { name: "Arundhati", age: 26, img: "/arundhati.png", rotate: -15, top: "30%", left: "2%", duration: "8s" },
+    { name: "Nandita", age: 25, img: "/nandita.png", rotate: 12, top: "35%", left: "85%", duration: "6s" },
+    { name: "Shalini", age: 24, img: "/girl2.png", rotate: -8, top: "55%", left: "1%", duration: "7s" },
+    { name: "Divya", age: 26, img: "/girl3.png", rotate: 10, top: "60%", left: "88%", duration: "5s" },
+    { name: "Kavya", age: 25, img: "/girl4.png", rotate: -10, top: "80%", left: "5%", duration: "8s" },
+    { name: "Anjali", age: 28, img: "/girl5.png", rotate: 5, top: "85%", left: "25%", duration: "6s" },
+    { name: "Riya", age: 23, img: "/girl6.png", rotate: -12, top: "82%", left: "75%", duration: "7s" }
   ];
 
   const floatingElements = [
