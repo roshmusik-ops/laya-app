@@ -3,7 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { db } from "./firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, setDoc } from "firebase/firestore";
 import { AppProvider, useApp } from "./contexts/AppContext";
 import { Capacitor } from "@capacitor/core";
 
@@ -544,7 +544,7 @@ function MainApp() {
 
     try {
       const userId = currentUser.uid || currentUser.id;
-      await updateDoc(doc(db, "users", userId), updates);
+      await setDoc(doc(db, "users", userId), updates, { merge: true });
       setCurrentUser({ ...currentUser, ...updates });
       setShowKeyInput(false);
       setActivationKey("");
