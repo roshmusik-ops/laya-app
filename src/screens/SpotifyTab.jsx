@@ -71,7 +71,8 @@ export default function SpotifyTab() {
       <ScrollReveal animation="popIn" delay={0.5}>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, textAlign: "center", marginTop: 20 }}>
           Powered by Roshmusik Live Tracks
-      </p>
+        </p>
+      </ScrollReveal>
     </div>
   );
 }
