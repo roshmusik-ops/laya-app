@@ -4,8 +4,8 @@ import { useApp } from "../contexts/AppContext";
 const TABS = [
   { id:"discover",  icon:"🔥", label:"Discover" },
   { id:"matches",   icon:"💬", label:"Matches"  },
-  { id:"spotify",   icon:"🎵", label:"Spotify" },
-  { id:"community", icon:"🏘️", label:"Community" },
+  { id:"live",      icon:"🎙️", label:"Live" },
+  { id:"spotify",   icon:"🎵", label:"Music" },
   { id:"profile",   icon:"👤", label:"Profile"  },
 ];
 

@@ -140,6 +140,12 @@ export default function ProfileTab() {
         </button>
       )}
 
+      {/* Community */}
+      <button onClick={() => navigate("/app/community")}
+        style={{ width:"100%", padding:"12px", borderRadius:50, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", color:"rgba(255,255,255,.55)", fontFamily:"Nunito,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", marginBottom:10 }}>
+        🏘️ Community Feed
+      </button>
+
       {/* Admin login */}
       <button onClick={() => { setAdminMode(true); setActiveTab("admin"); }}
         style={{ width:"100%", padding:"12px", borderRadius:50, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", color:"rgba(255,255,255,.35)", fontFamily:"Nunito,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", marginBottom:10 }}>

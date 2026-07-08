@@ -15,6 +15,7 @@ import MatchesTab       from "./screens/MatchesTab";
 import ChatScreen       from "./screens/ChatScreen";
 import VideoCallScreen  from "./screens/VideoCallScreen";
 import AudioCallScreen  from "./screens/AudioCallScreen";
+import LiveRoomTab      from "./screens/LiveRoomTab";
 import LandingPage      from "./screens/LandingPage";
 import FuturisticOrb    from "./components/FuturisticOrb";
 
@@ -621,6 +622,7 @@ function MainApp() {
       <Routes>
         <Route path="discover" element={<DiscoverTab />} />
         <Route path="matches" element={<MatchesTab />} />
+        <Route path="live" element={<LiveRoomTab />} />
         <Route path="spotify" element={<SpotifyTab />} />
         <Route path="chat" element={<ChatScreen />} />
         <Route path="community" element={<CommunityTab />} />
