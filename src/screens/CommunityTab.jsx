@@ -75,8 +75,8 @@ export default function CommunityTab() {
           {/* Post composer */}
           <div style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:"14px", marginBottom:16 }}>
             <div style={{ display:"flex", gap:10, marginBottom:10 }}>
-              <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>
-                {currentUser?.photos?.[0] || "👤"}
+              <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0, overflow:"hidden" }}>
+                {currentUser?.photos?.[0] ? <img src={currentUser.photos[0]} alt="avatar" style={{width:"100%", height:"100%", objectFit:"cover"}}/> : "👤"}
               </div>
               <textarea className="input" placeholder="Share something with the community... 🌴"
                 value={newPost} onChange={e => setNewPost(e.target.value)} rows={2}
@@ -92,7 +92,9 @@ export default function CommunityTab() {
           {posts.map(post => (
             <div key={post.id} style={{ background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", borderRadius:16, padding:"14px 16px", marginBottom:10 }}>
               <div style={{ display:"flex", gap:10, marginBottom:10 }}>
-                <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>{post.avatar}</div>
+                <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0, overflow:"hidden" }}>
+                  {post.avatar?.length > 4 ? <img src={post.avatar} alt="avatar" style={{width:"100%", height:"100%", objectFit:"cover"}}/> : post.avatar}
+                </div>
                 <div>
                   <div style={{ fontWeight:800, fontSize:13 }}>{post.user}</div>
                   <div style={{ color:"rgba(255,255,255,.35)", fontSize:11 }}>📍 {post.district} · {post.time}</div>
