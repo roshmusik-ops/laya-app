@@ -151,17 +151,20 @@ export default function AdminDashboard() {
 
   const DISTRICTS = ["Thiruvananthapuram","Kollam","Pathanamthitta","Alappuzha","Kottayam","Idukki","Ernakulam","Thrissur","Palakkad","Malappuram","Kozhikode","Wayanad","Kannur","Kasaragod"];
 
-  const premiumUsers   = users.filter(u => u.premium);
-  const verifiedUsers  = users.filter(u => u.verified);
-  const onlineUsers    = users.filter(u => u.online);
-  const pendingUsers   = users.filter(u => u.status === "pending");
-  const approvedUsers  = users.filter(u => u.status !== "pending");
+  const safeUsers = users || [];
+  const safeMatches = matches || [];
+
+  const premiumUsers   = safeUsers.filter(u => u?.premium);
+  const verifiedUsers  = safeUsers.filter(u => u?.verified);
+  const onlineUsers    = safeUsers.filter(u => u?.online);
+  const pendingUsers   = safeUsers.filter(u => u?.status === "pending");
+  const approvedUsers  = safeUsers.filter(u => u?.status !== "pending");
   const revenue        = premiumUsers.length * 29;
 
-  const filtered = users.filter(u =>
-    ((u.name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (u.district || "").toLowerCase().includes(search.toLowerCase())) &&
-    (tab === "applications" ? u.status === "pending" : u.status !== "pending")
+  const filtered = safeUsers.filter(u =>
+    ((u?.name || "").toLowerCase().includes((search || "").toLowerCase()) ||
+    (u?.district || "").toLowerCase().includes((search || "").toLowerCase())) &&
+    (tab === "applications" ? u?.status === "pending" : u?.status !== "pending")
   );
 
   // ── Guard: block non-admins ────────────────────────────────────────────
@@ -194,7 +197,7 @@ export default function AdminDashboard() {
           { n: verifiedUsers.length, label:"Verified",icon:"✅", color:"#22c55e" },
           { n: premiumUsers.length,  label:"Premium", icon:"⭐", color:"#ffd93d" },
           { n: onlineUsers.length,   label:"Online",  icon:"🟢", color:"#22c55e" },
-          { n: matches.length,  label:"Matches",      icon:"💕", color:"#f472b6" },
+          { n: safeMatches.length,  label:"Matches",      icon:"💕", color:"#f472b6" },
         ].map(s => (
           <div key={s.label} style={{ padding:"16px 14px", background:"rgba(255,255,255,.03)", border:`1px solid ${s.color}22`, borderRadius:14 }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
