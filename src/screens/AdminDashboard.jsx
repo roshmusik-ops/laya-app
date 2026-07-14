@@ -5,7 +5,7 @@ import { db } from "../firebase";
 import { doc, setDoc, deleteDoc, updateDoc, collection, query, where, onSnapshot } from "firebase/firestore";
 
 
-const ADMIN_EMAILS = ["rosh.musik@gmail.com", "pharmalinkthrissur@gmail.com"];
+const ADMIN_EMAILS = ["rosh.musik@gmail.com", "pharmalinkthrissur@gmail.com", "anoop@gmail.com"];
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -159,8 +159,8 @@ export default function AdminDashboard() {
   const revenue        = premiumUsers.length * 29;
 
   const filtered = users.filter(u =>
-    (u.name.toLowerCase().includes(search.toLowerCase()) ||
-    u.district?.toLowerCase().includes(search.toLowerCase())) &&
+    ((u.name || "").toLowerCase().includes(search.toLowerCase()) ||
+    (u.district || "").toLowerCase().includes(search.toLowerCase())) &&
     (tab === "applications" ? u.status === "pending" : u.status !== "pending")
   );
 
