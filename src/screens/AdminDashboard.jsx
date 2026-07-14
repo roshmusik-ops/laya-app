@@ -1,16 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useApp } from "../contexts/AppContext";
 import { db } from "../firebase";
-import { doc, setDoc, deleteDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, updateDoc, collection, query, where, onSnapshot } from "firebase/firestore";
 
-const ADMIN_PIN = import.meta.env.VITE_ADMIN_PIN || "000000";
+
+const ADMIN_EMAILS = ["rosh.musik@gmail.com", "pharmalinkthrissur@gmail.com"];
 
 export default function AdminDashboard() {
-  const { users, setUsers, matches, setActiveTab, showToast } = useApp();
-  const [pin, setPin]         = useState("");
-  const [auth, setAuth]       = useState(false);
-  const [tab, setTab]         = useState("users"); // users|revenue|districts
-  const [search, setSearch]   = useState("");
+  const navigate = useNavigate();
+  const { users, setUsers, matches, currentUser, showToast } = useApp();
+  const [pin, setPin]             = useState("");
+  const [auth, setAuth]           = useState(true);
+  const [tab, setTab]             = useState("users");
+  const [search, setSearch]       = useState("");
+  const [paymentRequests, setPaymentRequests] = useState([]);
+
+  // ── Block non-admins immediately ───────────────────────────────────────
+  const isAdmin = ADMIN_EMAILS.includes(currentUser?.email);
+
+  // ── Real-time listener for activation requests ─────────────────────────
+  useEffect(() => {
+    if (!auth) return;
+    const q = query(collection(db, "activation_requests"), where("status", "==", "pending"));
+    const unsub = onSnapshot(q, snap => {
+      const reqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setPaymentRequests(reqs);
+      // Toast when a NEW request arrives (after initial load)
+      if (reqs.length > 0) {
+        showToast(`💰 ${reqs.length} pending payment request${reqs.length > 1 ? 's' : ''}!`);
+      }
+    });
+    return () => unsub();
+  }, [auth]);
 
   const handleSeed = async () => {
     const mockProfiles = [
@@ -142,28 +164,20 @@ export default function AdminDashboard() {
     (tab === "applications" ? u.status === "pending" : u.status !== "pending")
   );
 
-  if (!auth) return (
-    <div className="app-wrap" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"80vh", padding:"0 32px" }}>
-      <div style={{ textAlign:"center", marginBottom:28 }}>
-        <div style={{ fontSize:44, marginBottom:10 }}>🔐</div>
-        <div className="serif" style={{ fontSize:24 }}>Admin Login</div>
-        <p style={{ color:"rgba(255,255,255,.35)", fontSize:13, marginTop:4 }}>Enter your admin PIN to continue</p>
-      </div>
-      <input className="input" type="password" placeholder="Admin PIN" value={pin}
-        onChange={e => setPin(e.target.value)} maxLength={6} style={{ textAlign:"center", fontSize:22, letterSpacing:8 }}
-        onKeyDown={e => e.key === "Enter" && (pin === ADMIN_PIN ? setAuth(true) : showToast("Wrong PIN!", "error"))} />
-      <button className="btn-red" style={{ width:"100%", padding:"15px", fontSize:15, marginTop:4 }}
-        onClick={() => pin === ADMIN_PIN ? setAuth(true) : showToast("Wrong PIN!", "error")}>
-        Login →
-      </button>
-      <button onClick={() => setActiveTab("profile")} style={{ marginTop:16, background:"none", border:"none", color:"rgba(255,255,255,.3)", cursor:"pointer", fontSize:13 }}>← Back</button>
+  // ── Guard: block non-admins ────────────────────────────────────────────
+  if (!isAdmin) return (
+    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"80vh", padding:"0 32px", textAlign:"center" }}>
+      <div style={{ fontSize:48, marginBottom:12 }}>🚫</div>
+      <div style={{ fontSize:20, fontWeight:700, color:"#ff4757", marginBottom:8 }}>Access Denied</div>
+      <p style={{ color:"rgba(255,255,255,.4)", fontSize:13, marginBottom:24 }}>You don't have admin privileges.</p>
+      <button onClick={() => navigate("/app/profile")} style={{ padding:"10px 24px", borderRadius:20, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", cursor:"pointer" }}>← Go Back</button>
     </div>
   );
 
   return (
     <div style={{ padding:"14px", animation:"fadeIn .4s ease" }}>
       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:18 }}>
-        <button onClick={() => { setAuth(false); setActiveTab("profile"); }}
+        <button onClick={() => { setAuth(false); navigate("/app/profile"); }}
           style={{ background:"none", border:"none", color:"rgba(255,255,255,.4)", fontSize:20, cursor:"pointer" }}>←</button>
         <div className="serif" style={{ fontSize:22 }}>Admin <span className="glow">Dashboard</span></div>
         <button onClick={handleSeed}
@@ -206,13 +220,16 @@ export default function AdminDashboard() {
       </div>
 
       {/* Tab switcher */}
-      <div style={{ display:"flex", gap:7, marginBottom:14 }}>
-        {["users","applications","districts","revenue"].map(t => (
+      <div style={{ display:"flex", gap:7, marginBottom:14, flexWrap:"wrap" }}>
+        {["users","applications","payments","districts","revenue"].map(t => (
           <button key={t} className={`chip ${tab===t?"active":""}`} onClick={() => setTab(t)}
-            style={{ flex:1, textAlign:"center", textTransform:"capitalize", position:"relative" }}>
+            style={{ flex:1, textAlign:"center", textTransform:"capitalize", position:"relative", minWidth:60 }}>
             {t}
             {t === "applications" && pendingUsers.length > 0 && (
               <span style={{ position:"absolute", top:-4, right:-4, background:"#ff6b6b", color:"#fff", fontSize:9, fontWeight:700, padding:"2px 5px", borderRadius:10 }}>{pendingUsers.length}</span>
+            )}
+            {t === "payments" && paymentRequests.length > 0 && (
+              <span style={{ position:"absolute", top:-4, right:-4, background:"#22c55e", color:"#fff", fontSize:9, fontWeight:700, padding:"2px 5px", borderRadius:10 }}>{paymentRequests.length}</span>
             )}
           </button>
         ))}
@@ -277,6 +294,56 @@ export default function AdminDashboard() {
             </div>
           ))}
         </>
+      )}
+
+      {/* Payments tab — activation requests */}
+      {tab === "payments" && (
+        <div>
+          {paymentRequests.length === 0 ? (
+            <div style={{ textAlign:"center", color:"rgba(255,255,255,.3)", padding:"40px 0" }}>
+              <div style={{ fontSize:40, marginBottom:12 }}>✅</div>
+              <div style={{ fontSize:13 }}>No pending payment requests</div>
+            </div>
+          ) : paymentRequests.map(req => (
+            <div key={req.id} style={{ padding:"14px", borderRadius:14, background:"rgba(34,197,94,.05)", border:"1px solid rgba(34,197,94,.2)", marginBottom:10 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10 }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontWeight:700, fontSize:12, marginBottom:5, wordBreak:"break-all" }}>📧 {req.email}</div>
+                  <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:4 }}>
+                    <span style={{ background:"rgba(212,175,55,.15)", border:"1px solid rgba(212,175,55,.3)", color:"#d4af37", padding:"2px 8px", borderRadius:20, fontSize:10, fontWeight:700 }}>⭐ {req.plan}</span>
+                    <span style={{ background:"rgba(255,255,255,.05)", color:"rgba(255,255,255,.4)", padding:"2px 8px", borderRadius:20, fontSize:10 }}>{req.durationDays}d</span>
+                  </div>
+                  <div style={{ color:"rgba(255,255,255,.3)", fontSize:10 }}>
+                    🕐 {new Date(req.requestedAt).toLocaleString('en-IN')}
+                  </div>
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:6, flexShrink:0 }}>
+                  <button onClick={async () => {
+                    try {
+                      const now = Date.now();
+                      await updateDoc(doc(db, "users", req.uid), {
+                        premium: true, plan: req.plan,
+                        premiumUntil: now + req.durationDays * 24 * 60 * 60 * 1000
+                      });
+                      await updateDoc(doc(db, "activation_requests", req.id), { status:"approved", approvedAt: now });
+                      showToast(`✅ ${req.email} activated as ${req.plan}!`, "success");
+                    } catch(err) { showToast("Failed: " + err.message, "error"); }
+                  }} style={{ padding:"7px 14px", borderRadius:10, background:"rgba(34,197,94,.15)", border:"1px solid rgba(34,197,94,.35)", color:"#22c55e", cursor:"pointer", fontSize:11, fontWeight:700 }}>
+                    ✅ Approve
+                  </button>
+                  <button onClick={async () => {
+                    try {
+                      await updateDoc(doc(db, "activation_requests", req.id), { status:"rejected", rejectedAt: Date.now() });
+                      showToast(`❌ Request from ${req.email} rejected.`);
+                    } catch(err) { showToast("Failed: " + err.message, "error"); }
+                  }} style={{ padding:"7px 14px", borderRadius:10, background:"rgba(255,71,87,.1)", border:"1px solid rgba(255,71,87,.25)", color:"#ff4757", cursor:"pointer", fontSize:11, fontWeight:700 }}>
+                    ❌ Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {/* Districts tab */}

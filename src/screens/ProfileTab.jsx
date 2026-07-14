@@ -1,11 +1,11 @@
 import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../contexts/AppContext";
 // Removed PremiumModal import
 
 export default function ProfileTab() {
   const navigate = useNavigate();
-  const { currentUser, setCurrentUser, matches, likedIds, setScreen, setShowPremium, setAdminMode, setActiveTab, showToast } = useApp();
+  const { currentUser, setCurrentUser, matches, likedIds, setShowPremium, setAdminMode, showToast } = useApp();
   const fileRef = useRef();
   if (!currentUser) return null;
 
@@ -147,8 +147,9 @@ export default function ProfileTab() {
       </button>
 
       {/* Admin login */}
-      <button onClick={() => { setAdminMode(true); setActiveTab("admin"); }}
-        style={{ width:"100%", padding:"12px", borderRadius:50, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", color:"rgba(255,255,255,.35)", fontFamily:"Nunito,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", marginBottom:10 }}>
+      <button
+         onClick={() => navigate("/app/admin")}
+         style={{ display:"block", textAlign:"center", textDecoration:"none", width:"100%", padding:"12px", borderRadius:50, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", color:"rgba(255,255,255,.35)", fontFamily:"Nunito,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", marginBottom:10 }}>
         🔐 Admin Dashboard
       </button>
 

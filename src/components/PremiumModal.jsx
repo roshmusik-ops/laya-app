@@ -53,6 +53,8 @@ export default function PremiumModal() {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [rcPackages, setRcPackages] = useState([]);
   const [activationKey, setActivationKey] = useState("");
+  const [isActivating, setIsActivating] = useState(false);
+  const [activationMsg, setActivationMsg] = useState("");
 
   const SP_LINKS = {
     laya_gold_monthly: "https://superprofile.bio/vp/gold-monthly",
@@ -123,6 +125,40 @@ export default function PremiumModal() {
       showToast("Connecting to Google Play... 🛒");
       alert("Google Play In-App Purchase goes here! \nYou would purchase: " + addon.id);
     }
+  };
+
+  // ── WEB PAYMENT SELF-ACTIVATION ─────────────────────────────────────────
+  const handleActivate = async () => {
+    if (!currentUser?.uid || !currentUser?.email) {
+      showToast('Please log in first.', 'error');
+      return;
+    }
+    setIsActivating(true);
+    setActivationMsg('');
+    try {
+      const res = await fetch('/api/activate-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid:   currentUser.uid,
+          email: currentUser.email,
+          plan:  selected
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`⏳ Request submitted! Admin will activate your account shortly.`, 'success');
+        setActivationMsg('✅ Request received! Your account will be activated after payment verification.');
+        setIsActivating(false);
+        return;
+      } else {
+        setActivationMsg(data.message || 'Activation failed.');
+        showToast(data.message || 'Activation failed.', 'error');
+      }
+    } catch (err) {
+      showToast('Connection error. Please try again.', 'error');
+    }
+    setIsActivating(false);
   };
 
   const handleActivationKey = async () => {
@@ -224,9 +260,42 @@ export default function PremiumModal() {
           }} disabled={isPurchasing}>
           {rcPackages.length === 0 ? "Subscribe via Superprofile" : (isPurchasing ? "Processing..." : "Subscribe with Google Play")}
         </button>
-        <p style={{ textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:10, marginBottom:24, fontWeight: 300, letterSpacing:"0.05em" }}>
+        <p style={{ textAlign:"center", color:"rgba(255,255,255,.3)", fontSize:10, marginBottom:16, fontWeight: 300, letterSpacing:"0.05em" }}>
           {rcPackages.length === 0 ? "Web payments securely handled by Superprofile." : "Secure payment via Google Play Billing. Cancel anytime."}
         </p>
+
+        {/* ── ALREADY PAID? SELF-ACTIVATE ── */}
+        {rcPackages.length === 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
+              <div style={{ flex:1, height:1, background:"rgba(255,255,255,.08)" }} />
+              <span style={{ color:"rgba(255,255,255,.35)", fontSize:10, fontWeight:700, whiteSpace:"nowrap" }}>ALREADY PAID?</span>
+              <div style={{ flex:1, height:1, background:"rgba(255,255,255,.08)" }} />
+            </div>
+            <button
+              onClick={handleActivate}
+              disabled={isActivating}
+              style={{
+                width:"100%", padding:"13px", borderRadius:12, cursor: isActivating ? "not-allowed" : "pointer",
+                background: isActivating ? "rgba(255,255,255,.05)" : "rgba(100,220,100,.08)",
+                border: "1px solid rgba(100,220,100,.25)", color: isActivating ? "rgba(255,255,255,.3)" : "#7dea7d",
+                fontSize:13, fontWeight:500, letterSpacing:"0.04em", transition:"all .3s ease"
+              }}
+              onMouseEnter={e => { if (!isActivating) e.currentTarget.style.background = "rgba(100,220,100,.15)"; }}
+              onMouseLeave={e => { if (!isActivating) e.currentTarget.style.background = "rgba(100,220,100,.08)"; }}
+            >
+              {isActivating ? "Submitting... ⏳" : "📨 Request Activation"}
+            </button>
+            {activationMsg && (
+              <p style={{ textAlign:"center", color:"#ff6b6b", fontSize:11, marginTop:10, fontWeight:300 }}>
+                {activationMsg}
+              </p>
+            )}
+            <p style={{ textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:10, marginTop:8, fontWeight:300 }}>
+              Paid on Superprofile? Submit a request — admin will verify &amp; activate within a few hours.
+            </p>
+          </div>
+        )}
 
         {/* Separator */}
         <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>

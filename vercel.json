@@ -4,6 +4,18 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/superprofile",
+      "destination": "/api/superprofile.js"
+    },
+    {
+      "source": "/api/activate-payment",
+      "destination": "/api/activate-payment.js"
+    },
+    {
+      "source": "/api/admin-activate",
+      "destination": "/api/admin-activate.js"
+    },
+    {
       "source": "/__/auth/:path*",
       "destination": "https://laya-new-2026.firebaseapp.com/__/auth/:path*"
     },
@@ -18,11 +30,33 @@
   ],
   "headers": [
     {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
           "key": "Cross-Origin-Opener-Policy",
           "value": "unsafe-none"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, max-age=0"
         }
       ]
     }
