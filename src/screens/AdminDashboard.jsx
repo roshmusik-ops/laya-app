@@ -5,7 +5,7 @@ import { db } from "../firebase";
 import { doc, setDoc, deleteDoc, updateDoc, collection, query, where, onSnapshot } from "firebase/firestore";
 
 
-const ADMIN_PIN = "laya2026";
+const ADMIN_PIN = "9191";
 
 
 export default function AdminDashboard() {
