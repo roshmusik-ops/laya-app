@@ -566,8 +566,7 @@ function MainApp() {
 
   const isNative = Capacitor.isNativePlatform();
   const now = Date.now();
-  // FORCE EVERYONE TO PREMIUM AS REQUESTED
-  const hasPremium = true; 
+  const hasPremium = currentUser?.premiumUntil ? currentUser.premiumUntil > now : currentUser?.premium;
   const isAdminRoute = window.location.pathname.includes("/app/admin");
   
   if (!isNative && !hasPremium && !isVIP && !isAdminRoute) {
