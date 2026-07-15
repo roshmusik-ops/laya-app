@@ -5,7 +5,7 @@ import { useApp } from "../contexts/AppContext";
 
 import { auth, db } from "../firebase";
 import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function AuthScreen() {
   const navigate = useNavigate();
@@ -26,9 +26,20 @@ export default function AuthScreen() {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          setCurrentUser(userData);
+          // Always ensure email comes from Firebase Auth (source of truth)
+          const mergedUser = {
+            ...userData,
+            email: user.email || userData.email || "",
+            uid:   user.uid,
+            id:    user.uid,
+          };
+          // Patch Firestore if email was missing
+          if (!userData.email && user.email) {
+            setDoc(doc(db, "users", user.uid), { email: user.email, uid: user.uid }, { merge: true });
+          }
+          setCurrentUser(mergedUser);
           navigate("/app");
-          showToast(`Welcome back, ${userData.name}! 🌴`);
+          showToast(`Welcome back, ${mergedUser.name}! 🌴`);
         } else {
           setName(user.displayName || "");
           setStep("name");
@@ -55,9 +66,10 @@ export default function AuthScreen() {
     const uid = user ? user.uid : "me_" + Date.now();
     
     const newUser = {
-      id: uid,
-      name: name.trim(),
-      email: user ? user.email : "",
+      id:         uid,
+      uid:        uid,
+      name:       name.trim(),
+      email:      user ? user.email : "",
       age: 25,
       district: "Ernakulam",
       bio: "",
