@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../contexts/AppContext";
 import { db } from "../firebase";
-import { doc, setDoc, deleteDoc, updateDoc, collection, query, where, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, updateDoc, collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
 
 
 const ADMIN_PIN = "9191";
@@ -18,6 +18,40 @@ export default function AdminDashboard() {
   const [tab, setTab]             = useState("users");
   const [search, setSearch]       = useState("");
   const [paymentRequests, setPaymentRequests] = useState([]);
+  const [manualEmail, setManualEmail]         = useState("");
+  const [manualPlan, setManualPlan]           = useState("Gold");
+  const [manualDays, setManualDays]           = useState(30);
+  const [manualLoading, setManualLoading]     = useState(false);
+
+  const handleManualActivate = async () => {
+    if (!manualEmail.trim()) { showToast("Enter user email", "error"); return; }
+    setManualLoading(true);
+    try {
+      // Find user by email in Firestore
+      const q = query(collection(db, "users"), where("email", "==", manualEmail.trim().toLowerCase()));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        showToast(`No user found with email: ${manualEmail}`, "error");
+        setManualLoading(false);
+        return;
+      }
+      const userDoc = snap.docs[0];
+      const now = Date.now();
+      await updateDoc(doc(db, "users", userDoc.id), {
+        premium: true,
+        plan: manualPlan,
+        premiumUntil: now + manualDays * 24 * 60 * 60 * 1000,
+        activatedAt: now,
+        activatedBy: "admin"
+      });
+      showToast(`✅ ${manualEmail} activated as ${manualPlan} for ${manualDays} days!`, "success");
+      setManualEmail("");
+    } catch (err) {
+      showToast("Failed: " + err.message, "error");
+    }
+    setManualLoading(false);
+  };
+
 
   const handlePinSubmit = () => {
     if (pin.toLowerCase() === ADMIN_PIN) {
@@ -323,13 +357,52 @@ export default function AdminDashboard() {
         </>
       )}
 
-      {/* Payments tab — activation requests */}
+      {/* Payments tab — manual activation + pending requests */}
       {tab === "payments" && (
         <div>
+          {/* Manual Activate Section */}
+          <div style={{ padding:"16px", borderRadius:14, background:"rgba(212,175,55,.06)", border:"1px solid rgba(212,175,55,.2)", marginBottom:16 }}>
+            <div style={{ fontSize:11, color:"#d4af37", fontWeight:700, letterSpacing:1.2, marginBottom:12 }}>⚡ MANUAL ACTIVATE USER</div>
+            <input
+              className="input"
+              placeholder="User email (e.g. user@gmail.com)"
+              value={manualEmail}
+              onChange={e => setManualEmail(e.target.value)}
+              style={{ marginBottom:10 }}
+            />
+            <div style={{ display:"flex", gap:8, marginBottom:12 }}>
+              <select
+                value={manualPlan}
+                onChange={e => setManualPlan(e.target.value)}
+                style={{ flex:1, padding:"10px 12px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"#fcfcfc", fontFamily:"Nunito,sans-serif", fontSize:13 }}
+              >
+                <option value="Gold">Gold</option>
+                <option value="Platinum">Platinum</option>
+              </select>
+              <select
+                value={manualDays}
+                onChange={e => setManualDays(Number(e.target.value))}
+                style={{ flex:1, padding:"10px 12px", borderRadius:10, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.12)", color:"#fcfcfc", fontFamily:"Nunito,sans-serif", fontSize:13 }}
+              >
+                <option value={30}>30 Days</option>
+                <option value={90}>90 Days</option>
+                <option value={180}>180 Days</option>
+                <option value={365}>1 Year</option>
+              </select>
+            </div>
+            <button
+              onClick={handleManualActivate}
+              disabled={manualLoading}
+              style={{ width:"100%", padding:"12px", borderRadius:10, background:"rgba(34,197,94,.15)", border:"1px solid rgba(34,197,94,.35)", color:"#22c55e", cursor: manualLoading ? "not-allowed" : "pointer", fontSize:13, fontWeight:700 }}
+            >
+              {manualLoading ? "Activating..." : "✅ Activate This User"}
+            </button>
+          </div>
+
+          {/* Pending activation requests from Firebase */}
           {paymentRequests.length === 0 ? (
-            <div style={{ textAlign:"center", color:"rgba(255,255,255,.3)", padding:"40px 0" }}>
-              <div style={{ fontSize:40, marginBottom:12 }}>✅</div>
-              <div style={{ fontSize:13 }}>No pending payment requests</div>
+            <div style={{ textAlign:"center", color:"rgba(255,255,255,.3)", padding:"20px 0" }}>
+              <div style={{ fontSize:13 }}>No pending automatic requests</div>
             </div>
           ) : paymentRequests.map(req => (
             <div key={req.id} style={{ padding:"14px", borderRadius:14, background:"rgba(34,197,94,.05)", border:"1px solid rgba(34,197,94,.2)", marginBottom:10 }}>
