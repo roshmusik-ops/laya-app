@@ -140,6 +140,15 @@ export default function ProfileTab() {
         </button>
       )}
 
+      {/* Hidden Admin Access (Only for VIPs) */}
+      {["pharmalinkthrissur@gmail.com", "anoop@gmail.com", "rosh.musik@gmail.com"].includes(currentUser?.email) && (
+        <button 
+          onClick={() => window.location.assign("/app/admin")}
+          style={{ width:"100%", padding:"15px", borderRadius:14, background:"rgba(212,175,55,0.15)", border:"1px solid rgba(212,175,55,0.4)", cursor:"pointer", color:"#d4af37", fontFamily:"Nunito,sans-serif", fontSize:14, fontWeight:700, marginBottom:10 }}>
+          🔐 Open Admin Dashboard
+        </button>
+      )}
+
       {/* Community */}
       <button onClick={() => navigate("/app/community")}
         style={{ width:"100%", padding:"12px", borderRadius:50, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.08)", color:"rgba(255,255,255,.55)", fontFamily:"Nunito,sans-serif", fontWeight:700, fontSize:13, cursor:"pointer", marginBottom:10 }}>
