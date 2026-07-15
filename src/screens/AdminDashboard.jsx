@@ -5,23 +5,35 @@ import { db } from "../firebase";
 import { doc, setDoc, deleteDoc, updateDoc, collection, query, where, onSnapshot } from "firebase/firestore";
 
 
-const ADMIN_EMAILS = ["rosh.musik@gmail.com", "pharmalinkthrissur@gmail.com", "anoop@gmail.com"];
+const ADMIN_PIN = "laya2026";
+
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { users, setUsers, matches, currentUser, showToast } = useApp();
   const [pin, setPin]             = useState("");
-  const [auth, setAuth]           = useState(true);
+  const [pinError, setPinError]   = useState("");
+  // Check if already authenticated this session
+  const [pinAuth, setPinAuth]     = useState(() => sessionStorage.getItem("laya_admin_auth") === "yes");
   const [tab, setTab]             = useState("users");
   const [search, setSearch]       = useState("");
   const [paymentRequests, setPaymentRequests] = useState([]);
 
-  // ── Block non-admins immediately ───────────────────────────────────────
-  const isAdmin = ADMIN_EMAILS.includes(currentUser?.email);
+  const handlePinSubmit = () => {
+    if (pin.toLowerCase() === ADMIN_PIN) {
+      sessionStorage.setItem("laya_admin_auth", "yes");
+      setPinAuth(true);
+      setPinError("");
+    } else {
+      setPinError("Wrong PIN. Try again.");
+      setPin("");
+    }
+  };
+
 
   // ── Real-time listener for activation requests ─────────────────────────
   useEffect(() => {
-    if (!auth) return;
+    if (!pinAuth) return;
     const q = query(collection(db, "activation_requests"), where("status", "==", "pending"));
     const unsub = onSnapshot(q, snap => {
       const reqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -32,7 +44,7 @@ export default function AdminDashboard() {
       }
     });
     return () => unsub();
-  }, [auth]);
+  }, [pinAuth]);
 
   const handleSeed = async () => {
     const mockProfiles = [
@@ -167,13 +179,25 @@ export default function AdminDashboard() {
     (tab === "applications" ? u?.status === "pending" : u?.status !== "pending")
   );
 
-  // ── Guard: block non-admins ────────────────────────────────────────────
-  if (!isAdmin) return (
+  // ── PIN Gate ────────────────────────────────────────────────
+  if (!pinAuth) return (
     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"80vh", padding:"0 32px", textAlign:"center" }}>
-      <div style={{ fontSize:48, marginBottom:12 }}>🚫</div>
-      <div style={{ fontSize:20, fontWeight:700, color:"#ff4757", marginBottom:8 }}>Access Denied</div>
-      <p style={{ color:"rgba(255,255,255,.4)", fontSize:13, marginBottom:24 }}>You don't have admin privileges.</p>
-      <button onClick={() => navigate("/app/profile")} style={{ padding:"10px 24px", borderRadius:20, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", color:"rgba(255,255,255,.5)", cursor:"pointer" }}>← Go Back</button>
+      <div style={{ fontSize:48, marginBottom:16 }}>🔐</div>
+      <div className="serif" style={{ fontSize:22, marginBottom:8 }}>Admin Access</div>
+      <p style={{ color:"rgba(255,255,255,.4)", fontSize:13, marginBottom:24 }}>Enter your admin PIN to continue.</p>
+      <input
+        type="password"
+        className="input"
+        placeholder="Enter PIN"
+        value={pin}
+        onChange={e => { setPin(e.target.value); setPinError(""); }}
+        onKeyDown={e => e.key === "Enter" && handlePinSubmit()}
+        style={{ textAlign:"center", letterSpacing:"0.2em", marginBottom:12, maxWidth:220 }}
+        autoFocus
+      />
+      {pinError && <p style={{ color:"#ff4757", fontSize:12, marginBottom:12 }}>{pinError}</p>}
+      <button className="btn-red" onClick={handlePinSubmit} style={{ padding:"12px 32px", fontSize:14 }}>Unlock Dashboard</button>
+      <button onClick={() => navigate("/app/profile")} style={{ marginTop:16, background:"none", border:"none", color:"rgba(255,255,255,.3)", cursor:"pointer", fontSize:13 }}>← Go Back</button>
     </div>
   );
 
