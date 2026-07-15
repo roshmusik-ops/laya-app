@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { db } from "../firebase";
+import { auth } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, onSnapshot, doc, updateDoc, arrayUnion, setDoc, addDoc, serverTimestamp, orderBy, where } from "firebase/firestore";
 import { initRevenueCat } from "../services/revenuecat";
 
@@ -33,7 +35,6 @@ export function AppProvider({ children }) {
         localStorage.setItem("laya_user", JSON.stringify(currentUser));
       } catch (err) {
         console.error("Failed to save user to localStorage, possibly due to large photos:", err);
-        // Fallback: Save without the huge data URI photos
         try {
           const fallbackUser = { ...currentUser, photos: [] };
           localStorage.setItem("laya_user", JSON.stringify(fallbackUser));
@@ -45,6 +46,26 @@ export function AppProvider({ children }) {
       localStorage.removeItem("laya_user");
     }
   }, [currentUser]);
+
+  // ── Always sync email+uid from Firebase Auth (fixes admin check) ──
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // Always patch email and uid from Firebase Auth — source of truth
+        setCurrentUser(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            email: firebaseUser.email || prev.email || "",
+            uid:   firebaseUser.uid,
+            id:    firebaseUser.uid,
+          };
+        });
+      }
+    });
+    return () => unsub();
+  }, []);
+
 
   // ── Users & matching
   const [users, setUsers]             = useState([
