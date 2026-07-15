@@ -567,8 +567,9 @@ function MainApp() {
   const isNative = Capacitor.isNativePlatform();
   const now = Date.now();
   const hasPremium = currentUser?.premiumUntil ? currentUser.premiumUntil > now : currentUser?.premium;
+  const isAdminRoute = window.location.pathname.includes("/app/admin");
   
-  if (!isNative && !hasPremium && !isVIP) {
+  if (!isNative && !hasPremium && !isVIP && !isAdminRoute) {
     return (
       <div className="app-wrap fade-in" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", padding:32, textAlign:"center", background: "#0a0a0a" }}>
         <div style={{ marginBottom:24 }}>
