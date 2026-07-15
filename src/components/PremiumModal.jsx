@@ -53,7 +53,6 @@ export default function PremiumModal() {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [rcPackages, setRcPackages] = useState([]);
   const [activationKey, setActivationKey] = useState("");
-  const [isActivating, setIsActivating] = useState(false);
   const [activationMsg, setActivationMsg] = useState("");
 
   const SP_LINKS = {
@@ -127,39 +126,42 @@ export default function PremiumModal() {
     }
   };
 
-  // ── WEB PAYMENT SELF-ACTIVATION ─────────────────────────────────────────
-  const handleActivate = async () => {
-    if (!currentUser?.uid || !currentUser?.email) {
+  // ── EMAIL ACTIVATION (mailto approach) ─────────────────────────────────
+  const handleActivate = () => {
+    if (!currentUser?.email) {
       showToast('Please log in first.', 'error');
       return;
     }
-    setIsActivating(true);
-    setActivationMsg('');
-    try {
-      const res = await fetch('/api/activate-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uid:   currentUser.uid,
-          email: currentUser.email,
-          plan:  selected
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        showToast(`⏳ Request submitted! Admin will activate your account shortly.`, 'success');
-        setActivationMsg('✅ Request received! Your account will be activated after payment verification.');
-        setIsActivating(false);
-        return;
-      } else {
-        setActivationMsg(data.message || 'Activation failed.');
-        showToast(data.message || 'Activation failed.', 'error');
-      }
-    } catch (err) {
-      showToast('Connection error. Please try again.', 'error');
-    }
-    setIsActivating(false);
+
+    const isPlatinum  = selected && selected.includes('plat');
+    const isYearly    = selected && selected.includes('yearly');
+    const planName    = isPlatinum ? 'Platinum' : 'Gold';
+    const duration    = isYearly ? '1 Year' : '1 Month';
+
+    const adminEmail = 'rosh.musik@gmail.com';
+    const subject = encodeURIComponent(`Laya Premium Activation Request — ${planName}`);
+    const body = encodeURIComponent(
+`Hi Admin,
+
+I have completed my payment and I am requesting premium activation.
+
+My Details:
+---------------------------------
+App Email: ${currentUser.email}
+User ID:   ${currentUser.uid || currentUser.id || 'N/A'}
+Plan:      ${planName} (${duration})
+---------------------------------
+
+Please verify my payment and activate my account.
+
+Thank you!`
+    );
+
+    window.open(`mailto:${adminEmail}?subject=${subject}&body=${body}`, '_blank');
+    showToast('📧 Email app opened! Just hit Send.', 'success');
+    setActivationMsg('✅ Your email app is open! Send the email and your account will be activated within a few hours after payment verification.');
   };
+
 
   const handleActivationKey = async () => {
     const key = activationKey.trim().toUpperCase();
@@ -274,25 +276,24 @@ export default function PremiumModal() {
             </div>
             <button
               onClick={handleActivate}
-              disabled={isActivating}
               style={{
-                width:"100%", padding:"13px", borderRadius:12, cursor: isActivating ? "not-allowed" : "pointer",
-                background: isActivating ? "rgba(255,255,255,.05)" : "rgba(100,220,100,.08)",
-                border: "1px solid rgba(100,220,100,.25)", color: isActivating ? "rgba(255,255,255,.3)" : "#7dea7d",
+                width:"100%", padding:"13px", borderRadius:12, cursor:"pointer",
+                background: "rgba(100,220,100,.08)",
+                border: "1px solid rgba(100,220,100,.25)", color: "#7dea7d",
                 fontSize:13, fontWeight:500, letterSpacing:"0.04em", transition:"all .3s ease"
               }}
-              onMouseEnter={e => { if (!isActivating) e.currentTarget.style.background = "rgba(100,220,100,.15)"; }}
-              onMouseLeave={e => { if (!isActivating) e.currentTarget.style.background = "rgba(100,220,100,.08)"; }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(100,220,100,.15)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(100,220,100,.08)"}
             >
-              {isActivating ? "Submitting... ⏳" : "📨 Request Activation"}
+              📧 Send Activation Request Email
             </button>
             {activationMsg && (
-              <p style={{ textAlign:"center", color:"#ff6b6b", fontSize:11, marginTop:10, fontWeight:300 }}>
+              <p style={{ textAlign:"center", color:"#7dea7d", fontSize:11, marginTop:10, fontWeight:300 }}>
                 {activationMsg}
               </p>
             )}
             <p style={{ textAlign:"center", color:"rgba(255,255,255,.25)", fontSize:10, marginTop:8, fontWeight:300 }}>
-              Paid on Superprofile? Submit a request — admin will verify &amp; activate within a few hours.
+              Paid on Superprofile? Tap to email the admin — your account will be activated within a few hours.
             </p>
           </div>
         )}

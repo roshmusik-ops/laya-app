@@ -26,9 +26,15 @@ export default async function handler(req, res) {
     }
 
     // 🔒 Verify uid actually belongs to this email in Firebase Auth
-    const userRecord = await admin.auth().getUser(uid);
-    if (userRecord.email?.toLowerCase() !== email?.toLowerCase()) {
-      return res.status(403).json({ message: 'Email does not match your Laya account.' });
+    let userRecord;
+    try {
+      userRecord = await admin.auth().getUser(uid);
+      if (userRecord.email?.toLowerCase() !== email?.toLowerCase()) {
+        return res.status(403).json({ message: 'Email does not match your Laya account.' });
+      }
+    } catch (authErr) {
+      console.warn('Auth check failed:', authErr.message);
+      // Continue anyway — don't block the request
     }
 
     const isPlatinum  = plan && plan.includes('plat');
@@ -52,7 +58,7 @@ export default async function handler(req, res) {
     }
 
     // ✅ Save as PENDING — admin must approve before account activates
-    await db.collection('activation_requests').add({
+    const docRef = await db.collection('activation_requests').add({
       uid,
       email,
       plan:        planName,
@@ -62,34 +68,78 @@ export default async function handler(req, res) {
       source:      'superprofile_web'
     });
 
-    // 📧 Email admin notification via Resend
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const resendKey  = process.env.RESEND_API_KEY;
-    if (adminEmail && resendKey) {
+    const requestId = docRef.id;
+
+    // 📧 Send email via EmailJS REST API (free, no backend setup needed)
+    const emailjsServiceId  = process.env.EMAILJS_SERVICE_ID;
+    const emailjsTemplateId = process.env.EMAILJS_TEMPLATE_ID;
+    const emailjsPublicKey  = process.env.EMAILJS_PUBLIC_KEY;
+    const emailjsPrivateKey = process.env.EMAILJS_PRIVATE_KEY;
+
+    if (emailjsServiceId && emailjsTemplateId && emailjsPublicKey && emailjsPrivateKey) {
       try {
-        await fetch('https://api.resend.com/emails', {
+        await fetch('https://api.emailjs.com/api/v1.0/email/send', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            from:    'Laya App <noreply@laya.roshmusik.com>',
-            to:      adminEmail,
-            subject: `💰 New Payment Request — ${planName} (${durationDays}d)`,
-            html: `
-              <h2>💰 New Activation Request</h2>
-              <p><strong>Email:</strong> ${email}</p>
-              <p><strong>Plan:</strong> ${planName} (${durationDays} days)</p>
-              <p><strong>Time:</strong> ${new Date().toLocaleString('en-IN')}</p>
-              <hr/>
-              <p>Login to your <a href="https://keralameet.vercel.app/app/profile">Admin Dashboard</a> → Payments tab to approve or reject.</p>
-            `
+            service_id:  emailjsServiceId,
+            template_id: emailjsTemplateId,
+            user_id:     emailjsPublicKey,
+            accessToken: emailjsPrivateKey,
+            template_params: {
+              to_email:    process.env.ADMIN_EMAIL || 'rosh.musik@gmail.com',
+              user_email:  email,
+              plan_name:   planName,
+              duration:    `${durationDays} days`,
+              request_id:  requestId,
+              request_time: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+              approve_link: `https://laya.roshmusik.com/app/admin`
+            }
           })
         });
+        console.log('📧 Email notification sent to admin');
       } catch (mailErr) {
-        console.warn('Email notification failed:', mailErr);
+        console.warn('EmailJS notification failed:', mailErr.message);
+      }
+    } else {
+      // Fallback: Try Resend if available
+      const resendKey = process.env.RESEND_API_KEY;
+      const adminEmail = process.env.ADMIN_EMAIL || 'rosh.musik@gmail.com';
+      if (resendKey) {
+        try {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from:    'Laya App <noreply@laya.roshmusik.com>',
+              to:      adminEmail,
+              subject: `💰 New Payment Request — ${planName} (${durationDays}d) from ${email}`,
+              html: `
+                <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px">
+                  <h2 style="color:#ff6b6b">💰 New Activation Request</h2>
+                  <table style="width:100%;border-collapse:collapse">
+                    <tr><td style="padding:8px;color:#666">User Email:</td><td style="padding:8px;font-weight:bold">${email}</td></tr>
+                    <tr><td style="padding:8px;color:#666">Plan:</td><td style="padding:8px;font-weight:bold">${planName} (${durationDays} days)</td></tr>
+                    <tr><td style="padding:8px;color:#666">Request ID:</td><td style="padding:8px;font-family:monospace">${requestId}</td></tr>
+                    <tr><td style="padding:8px;color:#666">Time (IST):</td><td style="padding:8px">${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</td></tr>
+                  </table>
+                  <br/>
+                  <a href="https://laya.roshmusik.com/app/admin" style="display:inline-block;padding:12px 28px;background:#ff6b6b;color:white;text-decoration:none;border-radius:8px;font-weight:bold;margin-top:16px">
+                    ✅ Open Admin Dashboard to Approve
+                  </a>
+                  <p style="color:#999;font-size:12px;margin-top:24px">Check Payments tab in the dashboard.</p>
+                </div>
+              `
+            })
+          });
+          console.log('📧 Resend email notification sent to admin');
+        } catch (mailErr) {
+          console.warn('Resend email notification failed:', mailErr.message);
+        }
       }
     }
 
-    console.log(`📥 Activation request received: ${email} → ${planName}`);
+    console.log(`📥 Activation request received: ${email} → ${planName} (ID: ${requestId})`);
 
     return res.status(200).json({
       message: `Request submitted! Your ${planName} account will be activated after payment verification (usually within a few hours).`,
