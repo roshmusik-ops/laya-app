@@ -559,64 +559,8 @@ function MainApp() {
   // SECURITY FIX: Prevent unauthenticated users from bypassing the landing page
   if (!currentUser) return <Navigate to="/" replace />;
 
-  // Web paywall: Only Premium members can use the web version
-  // VIP Founder Bypass list
-  const VIP_EMAILS = ["pharmalinkthrissur@gmail.com", "anoop@gmail.com", "rosh.musik@gmail.com"]; 
-  const isVIP = VIP_EMAILS.includes(currentUser?.email);
-
-  const isNative = Capacitor.isNativePlatform();
-  const now = Date.now();
-  const hasPremium = currentUser?.premiumUntil ? currentUser.premiumUntil > now : currentUser?.premium;
-  const isAdminRoute = window.location.pathname.includes("/app/admin");
-  
-  if (!isNative && !hasPremium && !isVIP && !isAdminRoute) {
-    return (
-      <div className="app-wrap fade-in" style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"100vh", padding:32, textAlign:"center", background: "#0a0a0a" }}>
-        <div style={{ marginBottom:24 }}>
-          <span style={{ fontSize:48 }}>🔒</span>
-        </div>
-        <h2 className="serif" style={{ fontSize:28, color:"#d4af37", marginBottom:16 }}>Premium Exclusive</h2>
-        <p style={{ color:"rgba(255,255,255,.6)", fontSize:14, marginBottom:32, lineHeight:1.6, maxWidth:300 }}>
-          Laya Web is restricted to Premium Members. Subscribe now to unlock full web access and start connecting.
-        </p>
-        <button 
-          className="btn-hot" 
-          style={{ padding:"16px 32px", fontSize: 14 }}
-          onClick={() => window.open("https://superprofile.bio/vp", "_blank")}
-        >
-          Subscribe Now
-        </button>
-        
-        {showKeyInput ? (
-          <div style={{ marginTop: 24, display: "flex", gap: 8, flexDirection: "column", width: "100%", maxWidth: 300 }}>
-            <input 
-              type="text" 
-              placeholder="Enter 8-digit key"
-              value={activationKey}
-              onChange={(e) => setActivationKey(e.target.value)}
-              className="text-input"
-              style={{ textAlign: "center", textTransform: "uppercase" }}
-            />
-            <button className="btn-hot" onClick={handleActivation} style={{ background: "#22c55e", padding: "12px" }}>
-              Unlock Access
-            </button>
-          </div>
-        ) : (
-          <p 
-            onClick={() => setShowKeyInput(true)}
-            style={{ color:"#d4af37", fontSize:12, marginTop:24, cursor: "pointer", textDecoration: "underline" }}
-          >
-            Have an Activation Key?
-          </p>
-        )}
-
-        <p style={{ color:"rgba(255,255,255,.4)", fontSize:12, marginTop:24, maxWidth:300, lineHeight:1.5 }}>
-          After subscribing, please contact support with your email to activate your account.
-        </p>
-      </div>
-    );
-  }
-
+  // Removed the Web paywall block so free users can access the app.
+  // Premium features are still protected by PremiumModal in other components.
 
   return (
     <div className="app-wrap" style={{ paddingBottom:72, minHeight:"100vh", overflowY:"auto", overflowX:"hidden", WebkitOverflowScrolling:"touch", position:"relative" }}>
