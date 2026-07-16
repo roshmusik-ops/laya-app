@@ -579,7 +579,7 @@ function MainApp() {
         <Route path="*" element={<Navigate to="discover" replace />} />
       </Routes>
       <BottomNav />
-      {!isNative && <FloatingBeats />}
+      <FloatingBeats />
       {showMatch   && <MatchCelebration />}
       {showPremium && <PremiumModal />}
       {selectedUser && (
