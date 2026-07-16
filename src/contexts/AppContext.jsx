@@ -121,12 +121,14 @@ export function AppProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  // ── Firebase Sync (Current User State) ──
+  // ── Firebase Sync (Current User State & Matches) ──
   useEffect(() => {
     if (!currentUser?.id) return;
-    const unsub = onSnapshot(doc(db, "users", currentUser.id), (docSnap) => {
+    const unsubUser = onSnapshot(doc(db, "users", currentUser.id), (docSnap) => {
        if (docSnap.exists()) {
           const data = docSnap.data();
+          setSwipedIds(data.swipedIds || []);
+          setLikedIds(data.likedIds || []);
           setCurrentUser(prev => {
             if (!prev) return prev;
             return {
@@ -138,8 +140,34 @@ export function AppProvider({ children }) {
           });
        }
     });
-    return () => unsub();
 
+    const qMatches = query(
+      collection(db, "matches"),
+      where("userIds", "array-contains", currentUser.id)
+    );
+    const unsubMatches = onSnapshot(qMatches, (snapshot) => {
+      const liveMatches = snapshot.docs.map(doc => {
+        const data = doc.data();
+        const otherUserId = data.userIds.find(id => id !== currentUser.id);
+        const otherUser = data.users[otherUserId] || {};
+        return {
+          id: otherUserId,
+          name: otherUser.name,
+          photos: [otherUser.photo],
+          matchedAt: data.matchedAt?.toMillis() || Date.now(),
+          firstMessageSent: data.firstMessageSent || false
+        };
+      });
+      setMatches(liveMatches);
+    });
+
+    return () => {
+      unsubUser();
+      unsubMatches();
+    };
+  }, [currentUser?.id]);
+
+  useEffect(() => {
     // Initialize RevenueCat for native payments
     if (currentUser?.id) {
       initRevenueCat(currentUser.id);
@@ -161,23 +189,42 @@ export function AppProvider({ children }) {
     // Optimistic local update so swiping works immediately
     setSwipedIds(prev => [...prev, user.id]);
 
+    // Update Firestore
+    const userRef = doc(db, "users", currentUser.id);
+    await updateDoc(userRef, {
+      swipedIds: arrayUnion(user.id),
+      likedIds: arrayUnion(user.id)
+    }).catch(console.error);
+
     // Check for match
     const isMatch = (user.likedIds || []).includes(currentUser.id);
-    const matchData = {
-      ...user,
-      matchedAt: Date.now(),
-      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-      firstMessageSent: false,
-    };
 
     if (isMatch) {
+      const matchData = {
+        ...user,
+        matchedAt: Date.now(),
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+        firstMessageSent: false,
+      };
       setMatchedUser(matchData);
       setShowMatch(true);
+      
+      const chatId = [currentUser.id, user.id].sort().join("_");
+      await setDoc(doc(db, "matches", chatId), {
+        userIds: [currentUser.id, user.id],
+        matchedAt: serverTimestamp(),
+        users: {
+          [currentUser.id]: { id: currentUser.id, name: currentUser.name || "", photo: currentUser.photos?.[0] || "" },
+          [user.id]: { id: user.id, name: user.name || "", photo: user.photos?.[0] || "" }
+        },
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+        firstMessageSent: false
+      }).catch(console.error);
+
       setNotifications(p => [
         { id: `n${Date.now()}`, text: `You matched with ${user.name}! 🎉`, time: "just now", read: false, type: "match" },
         ...p
       ]);
-      setMatches(prev => [...prev, matchData]);
     } else {
       showToast(`Connect request sent to ${user.name}!`);
     }
@@ -189,6 +236,12 @@ export function AppProvider({ children }) {
     
     // Optimistic local update
     setSwipedIds(prev => [...prev, user.id]);
+
+    // Update Firestore
+    const userRef = doc(db, "users", currentUser.id);
+    await updateDoc(userRef, {
+      swipedIds: arrayUnion(user.id)
+    }).catch(console.error);
   };
 
   // ── Send message
@@ -198,19 +251,19 @@ export function AppProvider({ children }) {
     const text = msgInput;
     setMsgInput("");
     
-    // Mark first message sent on match locally
-    setMatches(p => p.map(m => m.id === userId ? { ...m, firstMessageSent: true } : m));
+    const chatId = [currentUser.id, userId].sort().join("_");
     
-    // Bypass Firebase messaging
-    setMessages(prev => ({
-      ...prev,
-      [userId]: [...(prev[userId] || []), {
-        id: "msg_" + Date.now(),
-        text,
-        from: "me",
-        time: new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" })
-      }]
-    }));
+    // Update match firstMessageSent in Firestore
+    const matchRef = doc(db, "matches", chatId);
+    await updateDoc(matchRef, { firstMessageSent: true }).catch(()=>null);
+    
+    // Add to Firebase messages subcollection
+    const messagesRef = collection(db, "chats", chatId, "messages");
+    await addDoc(messagesRef, {
+      text,
+      senderId: currentUser.id,
+      timestamp: serverTimestamp()
+    });
   };
   
   // ── Firebase Sync (Real-time Chat) ──
