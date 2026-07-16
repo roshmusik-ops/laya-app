@@ -157,7 +157,7 @@ Please verify my payment and activate my account.
 Thank you!`
     );
 
-    window.open(`mailto:${adminEmail}?subject=${subject}&body=${body}`, '_blank');
+    window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
     showToast('📧 Email app opened! Just hit Send.', 'success');
     setActivationMsg('✅ Your email app is open! Send the email and your account will be activated within a few hours after payment verification.');
   };
