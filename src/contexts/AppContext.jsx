@@ -111,15 +111,14 @@ export function AppProvider({ children }) {
 
   // ── Firebase Sync (Users Stream) ──
   useEffect(() => {
-    // Mocked for demo
-    // const q = query(collection(db, "users"));
-    // const unsubscribe = onSnapshot(q, (snapshot) => {
-    //   const liveUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    //   setUsers(liveUsers);
-    // }, (error) => {
-    //   console.error("Error fetching users:", error);
-    // });
-    // return () => unsubscribe();
+    const q = query(collection(db, "users"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const liveUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setUsers(liveUsers);
+    }, (error) => {
+      console.error("Error fetching users:", error);
+    });
+    return () => unsubscribe();
   }, []);
 
   // ── Firebase Sync (Current User State) ──
