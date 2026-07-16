@@ -157,9 +157,10 @@ Please verify my payment and activate my account.
 Thank you!`
     );
 
-    window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
-    showToast('📧 Email app opened! Just hit Send.', 'success');
-    setActivationMsg('✅ Your email app is open! Send the email and your account will be activated within a few hours after payment verification.');
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${adminEmail}&su=${subject}&body=${body}`;
+    window.open(gmailUrl, '_blank');
+    showToast('📧 Gmail opened! Just hit Send.', 'success');
+    setActivationMsg(`✅ Gmail is open! (If it didn't open, manually email ${adminEmail} with your User ID).`);
   };
 
 
