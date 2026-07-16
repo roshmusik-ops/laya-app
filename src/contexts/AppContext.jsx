@@ -140,7 +140,6 @@ export function AppProvider({ children }) {
        }
     });
     return () => unsub();
-  }, [currentUser?.id]);
 
     // Initialize RevenueCat for native payments
     if (currentUser?.id) {
