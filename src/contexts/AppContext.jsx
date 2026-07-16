@@ -124,17 +124,23 @@ export function AppProvider({ children }) {
 
   // ── Firebase Sync (Current User State) ──
   useEffect(() => {
-    // Mocked for demo
-    // if (!currentUser?.id) return;
-    // const unsub = onSnapshot(doc(db, "users", currentUser.id), (docSnap) => {
-    //    if (docSnap.exists()) {
-    //       const data = docSnap.data();
-    //       setSwipedIds(data.swipedIds || []);
-    //       setLikedIds(data.likedIds || []);
-    //       setMatches(data.matches || []);
-    //    }
-    // });
-    // return () => unsub();
+    if (!currentUser?.id) return;
+    const unsub = onSnapshot(doc(db, "users", currentUser.id), (docSnap) => {
+       if (docSnap.exists()) {
+          const data = docSnap.data();
+          setCurrentUser(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              premium: data.premium || false,
+              plan: data.plan || "Free",
+              status: data.status || "approved"
+            };
+          });
+       }
+    });
+    return () => unsub();
+  }, [currentUser?.id]);
 
     // Initialize RevenueCat for native payments
     if (currentUser?.id) {
