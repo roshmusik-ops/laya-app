@@ -16,7 +16,11 @@ const MODES = [
 export default function ProfileSetup() {
   const navigate = useNavigate();
   const location = useLocation();
+  // Only explicitly named paid plans should grant premium status.
+  // Fallback to "Free" if plan is missing/undefined (e.g., after OAuth redirect wipes state).
+  const PREMIUM_PLANS = ["Gold", "Platinum"];
   const selectedPlan = location.state?.plan || "Free";
+  const isPremiumPlan = PREMIUM_PLANS.includes(selectedPlan);
   const { currentUser, setCurrentUser, showToast } = useApp();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -95,7 +99,7 @@ export default function ProfileSetup() {
         photos: form.photos, // Just use the local data URIs since we aren't uploading
         age: parseInt(form.age) || 25,
         tags: form.interest ? [form.interest] : [],
-        premium: selectedPlan !== "Free",
+        premium: isPremiumPlan,
         plan: selectedPlan,
         status: "approved"
       };

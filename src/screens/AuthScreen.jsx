@@ -10,7 +10,8 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 export default function AuthScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const selectedPlan = location.state?.plan || "Free";
+  // Restore plan from sessionStorage (survives Google OAuth redirect) or location state
+  const selectedPlan = location.state?.plan || sessionStorage.getItem("laya_selected_plan") || "Free";
   const { setCurrentUser, showToast } = useApp();
   const [step, setStep]         = useState("login"); // login | name
   const [loading, setLoading]   = useState(false);
@@ -55,6 +56,9 @@ export default function AuthScreen() {
   }, []);
 
   const handleGoogleLogin = () => {
+    // Save plan before redirect — signInWithRedirect causes a full page reload
+    // which wipes React Router state. sessionStorage survives the redirect.
+    sessionStorage.setItem("laya_selected_plan", selectedPlan);
     const provider = new GoogleAuthProvider();
     signInWithRedirect(auth, provider);
   };
@@ -86,6 +90,8 @@ export default function AuthScreen() {
       status: "approved",
     };
     setCurrentUser(newUser);
+    // Clear the persisted plan now that we're navigating forward
+    sessionStorage.removeItem("laya_selected_plan");
     navigate("/setup", { state: { plan: selectedPlan } });
     showToast(`Welcome to Laya, ${name}! 🌴`);
   };
