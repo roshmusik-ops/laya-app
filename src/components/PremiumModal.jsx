@@ -55,6 +55,16 @@ export default function PremiumModal() {
   const [activationKey, setActivationKey] = useState("");
   const [activationMsg, setActivationMsg] = useState("");
 
+  const SP_LINKS = {
+    laya_gold_monthly: "https://superprofile.bio/vp/gold-monthly",
+    laya_gold_yearly: "https://superprofile.bio/vp/gold-yearly",
+    laya_plat_monthly: "https://superprofile.bio/vp/platinum-monthly",
+    laya_plat_yearly: "https://superprofile.bio/vp/platinum-yearly",
+    laya_super5: "https://superprofile.bio/vp/5-superconnects",
+    laya_boost: "https://superprofile.bio/vp/--24hr-profile-boost",
+    laya_verified: "https://superprofile.bio/vp/--verified-badge"
+  };
+
   useEffect(() => {
     const loadOfferings = async () => {
       const pkgs = await fetchOfferings();
@@ -79,23 +89,13 @@ export default function PremiumModal() {
     { icon:"🚫", text:"Zero ads, ever"                 },
   ];
 
-  const handleUpgrade = async () => {
+  const handlePurchase = async () => {
     setIsPurchasing(true);
-    showToast("Connecting to Google Play... 🛒");
-    
-    // Find the actual RevenueCat package if loaded
-    const pkgToBuy = rcPackages.find(p => p.identifier === selected);
-    
-    if (pkgToBuy) {
-      const result = await purchasePackage(pkgToBuy);
-      if (result.success) {
-        showToast("Welcome to Premium! 🎉", "success");
-        // Update user state
-        setCurrentUser({ ...currentUser, premium: true, plan: selected.includes("gold") ? "Gold" : "Platinum" });
-        setShowPremium(false);
-      } else {
-        showToast("Purchase cancelled or failed.", "error");
-      }
+    if (rcPackages.length === 0) {
+      // Open Superprofile link for web users
+      const link = SP_LINKS[selected] || "https://superprofile.bio/vp";
+      window.open(link, "_blank");
+      showToast("Redirecting to secure payment...", "success");
     } else {
       // Fallback for Web Demo
       setTimeout(() => {
@@ -108,7 +108,12 @@ export default function PremiumModal() {
   };
 
   const handleAddon = (addon) => {
-    showToast("To purchase add-ons, please contact admin directly.", "info");
+    if (rcPackages.length === 0) {
+      window.open(SP_LINKS[addon.id] || "https://superprofile.bio/vp", "_blank");
+    } else {
+      showToast("Connecting to Google Play... 🛒");
+      alert("Google Play In-App Purchase goes here! \nYou would purchase: " + addon.id);
+    }
   };
 
   // ── EMAIL ACTIVATION (mailto approach) ─────────────────────────────────
