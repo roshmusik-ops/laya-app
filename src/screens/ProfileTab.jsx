@@ -14,6 +14,11 @@ export default function ProfileTab() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (!currentUser.id) {
+      alert("Error: Your profile is missing a unique ID. Please log out and log back in to fix this.");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = ev => {
       const img = new Image();
@@ -31,9 +36,15 @@ export default function ProfileTab() {
         // Get compressed base64 (jpeg, 0.7 quality)
         const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
 
-        // Update local state
-        const newPhotos = [...(currentUser.photos || ["","","",""])];
+        // Ensure it's a proper array of 4 items
+        let currentPhotos = Array.isArray(currentUser.photos) ? currentUser.photos : [currentUser.photos || "", "", "", ""];
+        if (currentPhotos.length < 4) {
+          currentPhotos = [...currentPhotos, "", "", "", ""].slice(0, 4);
+        }
+        
+        const newPhotos = [...currentPhotos];
         newPhotos[idx] = compressedBase64;
+        
         setCurrentUser(p => ({ ...p, photos: newPhotos }));
         showToast("Photo updated! 📸");
 
@@ -42,8 +53,10 @@ export default function ProfileTab() {
           await setDoc(doc(db, "users", currentUser.id), { photos: newPhotos }, { merge: true });
         } catch (err) {
           console.error("Failed to sync photo to Firestore", err);
+          alert("Upload failed: " + err.message);
         }
       };
+      img.onerror = () => alert("Invalid image file.");
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
