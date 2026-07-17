@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../contexts/AppContext";
-// Removed PremiumModal import
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function ProfileTab() {
   const navigate = useNavigate();
@@ -12,12 +13,38 @@ export default function ProfileTab() {
   const handlePhotoChange = (e, idx) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = ev => {
-      const newPhotos = [...(currentUser.photos || ["","","",""])];
-      newPhotos[idx] = ev.target.result;
-      setCurrentUser(p => ({ ...p, photos: newPhotos }));
-      showToast("Photo updated! 📸");
+      const img = new Image();
+      img.onload = async () => {
+        // Compress image using canvas
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 500;
+        const scaleSize = MAX_WIDTH / img.width;
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Get compressed base64 (jpeg, 0.7 quality)
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+
+        // Update local state
+        const newPhotos = [...(currentUser.photos || ["","","",""])];
+        newPhotos[idx] = compressedBase64;
+        setCurrentUser(p => ({ ...p, photos: newPhotos }));
+        showToast("Photo updated! 📸");
+
+        // Sync to Firestore
+        try {
+          await updateDoc(doc(db, "users", currentUser.id), { photos: newPhotos });
+        } catch (err) {
+          console.error("Failed to sync photo to Firestore", err);
+        }
+      };
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   };
