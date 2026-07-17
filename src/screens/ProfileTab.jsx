@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../contexts/AppContext";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 export default function ProfileTab() {
@@ -39,7 +39,7 @@ export default function ProfileTab() {
 
         // Sync to Firestore
         try {
-          await updateDoc(doc(db, "users", currentUser.id), { photos: newPhotos });
+          await setDoc(doc(db, "users", currentUser.id), { photos: newPhotos }, { merge: true });
         } catch (err) {
           console.error("Failed to sync photo to Firestore", err);
         }

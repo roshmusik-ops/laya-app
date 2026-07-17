@@ -11,6 +11,13 @@ const MOCK_NOTIFICATIONS = [
   { id:"n1", text:"Welcome to Laya! 💫", time:"just now", read:false, type:"like" },
 ];
 
+const MOCK_PROFILES = [
+  { id:"m1", name:"Aiswarya", age:23, district:"Ernakulam", bio:"Coffee & Coding ☕", photos:["/girl1.png"], mode:"date", verified:true },
+  { id:"m2", name:"Devika", age:25, district:"Thrissur", bio:"Wanderlust & photography 📸", photos:["/sneha.png"], mode:"friends", verified:true },
+  { id:"m3", name:"Lakshmi", age:24, district:"Kozhikode", bio:"Foodie & traveler 🍜", photos:["/priya.png"], mode:"date", verified:true },
+  { id:"m4", name:"Vishnu", age:27, district:"Ernakulam", bio:"Tech enthusiast 💻", photos:["/vishnu.png"], mode:"network", verified:true },
+];
+
 // ─── CONTEXT ───────────────────────────────────────────────────────────────
 const AppContext = createContext(null);
 export const useApp = () => useContext(AppContext);
@@ -114,7 +121,7 @@ export function AppProvider({ children }) {
     const q = query(collection(db, "users"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const liveUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setUsers(liveUsers);
+      setUsers([...MOCK_PROFILES, ...liveUsers]);
     }, (error) => {
       console.error("Error fetching users:", error);
     });
