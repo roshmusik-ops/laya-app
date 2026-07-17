@@ -631,7 +631,7 @@ export const SONGS = [
   { id: "t2", title:"Kanne Ponmaniye",   artist:"Roshmusik", url:"/Kanne_Ponmaniye.mp3",     emoji:"✨", cover:"/fake2.jpg", duration:"4:10", mood:"Romantic", genre:"Lofi" },
   { id: "t3", title:"Nizhal Variye",     artist:"Roshmusik", url:"/Nizhal_Variye.mp3",       emoji:"👤", cover:"/fake3.jpg", duration:"2:50", mood:"Sad", genre:"Acoustic" },
   { id: "t4", title:"Poonilaa Veezhukam", artist:"Roshmusik", url:"/Poonilaa_Veezhukam.mp3", emoji:"🎵", cover:"/fake4.jpg", duration:"5:00", mood:"Dreamy", genre:"Lofi" },
-  { id: "t5", title:"Laya Theme (Radio Mango)", artist:"Laya", url:"/laya.mp3", emoji:"📻", cover:"/laya_logo.png", duration:"1:00", mood:"Vibe", genre:"Pop" }
+  { id: "t5", title:"Laya Theme", artist:"Laya", url:"/laya.mp3", emoji:"📻", cover:"/laya_logo.png", duration:"1:00", mood:"Vibe", genre:"Pop" }
 ];
 
 function MusicPlayer() {
