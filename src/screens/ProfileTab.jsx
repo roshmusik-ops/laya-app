@@ -57,7 +57,9 @@ export default function ProfileTab() {
             </div>
           </div>
           <div style={{ textAlign:"right" }}>
-            <div style={{ color:"#fcfcfc", fontSize:20, fontWeight:700 }}>29</div>
+            <div style={{ color:"#fcfcfc", fontSize:20, fontWeight:700 }}>
+              {currentUser.premiumUntil ? Math.max(0, Math.ceil((currentUser.premiumUntil - Date.now()) / (1000 * 60 * 60 * 24))) : 30}
+            </div>
             <div style={{ color: currentUser.plan === "Platinum" ? "rgba(255,107,107, 0.8)" : "rgba(212, 175, 55, 0.8)", fontSize:10, textTransform:"uppercase", letterSpacing:"0.05em", fontWeight: 700 }}>Days Left</div>
           </div>
         </div>

@@ -269,20 +269,10 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Revenue card */}
-      <div style={{ padding:"16px 18px", background:"linear-gradient(135deg,rgba(255,107,107,.1),rgba(255,71,87,.04))", border:"1px solid rgba(255,107,107,.2)", borderRadius:16, marginBottom:16 }}>
-        <div style={{ fontSize:11, color:"rgba(255,255,255,.4)", fontWeight:700, letterSpacing:1.5, marginBottom:6 }}>RAZORPAY REVENUE THIS MONTH</div>
-        <div className="serif" style={{ fontSize:36, color:"#ff6b6b" }}>₹{revenue.toLocaleString()}</div>
-        <div style={{ color:"rgba(255,255,255,.4)", fontSize:12, marginTop:3 }}>{premiumUsers.length} premium × ₹29 + add-ons</div>
-        <a href="https://dashboard.razorpay.com" target="_blank" rel="noreferrer"
-          style={{ display:"inline-block", marginTop:10, padding:"6px 16px", borderRadius:20, background:"rgba(255,107,107,.15)", border:"1px solid rgba(255,107,107,.3)", color:"#ff9a9a", fontSize:12, fontWeight:700 }}>
-          Open Razorpay Dashboard →
-        </a>
-      </div>
 
       {/* Tab switcher */}
       <div style={{ display:"flex", gap:7, marginBottom:14, flexWrap:"wrap" }}>
-        {["users","applications","payments","districts","revenue"].map(t => (
+        {["users","applications","payments","districts"].map(t => (
           <button key={t} className={`chip ${tab===t?"active":""}`} onClick={() => setTab(t)}
             style={{ flex:1, textAlign:"center", textTransform:"capitalize", position:"relative", minWidth:60 }}>
             {t}
@@ -462,18 +452,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Revenue tab */}
-      {tab === "revenue" && (
-        <div style={{ textAlign:"center", padding:"32px 0" }}>
-          <div style={{ fontSize:44, marginBottom:14 }}>📊</div>
-          <p style={{ fontWeight:700, marginBottom:8 }}>Full analytics in Razorpay Dashboard</p>
-          <p style={{ color:"rgba(255,255,255,.35)", fontSize:13, marginBottom:20 }}>Connect your Razorpay account to see payment history, subscriptions, and refunds in real-time.</p>
-          <a href="https://dashboard.razorpay.com" target="_blank" rel="noreferrer" className="btn-red"
-            style={{ padding:"12px 28px", fontSize:14, display:"inline-block" }}>
-            Open Razorpay Dashboard →
-          </a>
-        </div>
-      )}
+
     </div>
   );
 }

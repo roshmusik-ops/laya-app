@@ -55,16 +55,6 @@ export default function PremiumModal() {
   const [activationKey, setActivationKey] = useState("");
   const [activationMsg, setActivationMsg] = useState("");
 
-  const SP_LINKS = {
-    laya_gold_monthly: "https://superprofile.bio/vp/gold-monthly",
-    laya_gold_yearly: "https://superprofile.bio/vp/gold-yearly",
-    laya_plat_monthly: "https://superprofile.bio/vp/platinum-monthly",
-    laya_plat_yearly: "https://superprofile.bio/vp/platinum-yearly",
-    laya_super5: "https://superprofile.bio/vp/5-superconnects",
-    laya_boost: "https://superprofile.bio/vp/--24hr-profile-boost",
-    laya_verified: "https://superprofile.bio/vp/--verified-badge"
-  };
-
   useEffect(() => {
     const loadOfferings = async () => {
       const pkgs = await fetchOfferings();
@@ -118,12 +108,7 @@ export default function PremiumModal() {
   };
 
   const handleAddon = (addon) => {
-    if (rcPackages.length === 0) {
-      window.open(SP_LINKS[addon.id] || "https://superprofile.bio/vp", "_blank");
-    } else {
-      showToast("Connecting to Google Play... 🛒");
-      alert("Google Play In-App Purchase goes here! \nYou would purchase: " + addon.id);
-    }
+    showToast("To purchase add-ons, please contact admin directly.", "info");
   };
 
   // ── EMAIL ACTIVATION (mailto approach) ─────────────────────────────────
