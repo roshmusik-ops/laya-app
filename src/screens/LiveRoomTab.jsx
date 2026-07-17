@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useApp } from "../contexts/AppContext";
 import ScrollReveal from "../components/ScrollReveal";
 
-const LIVE_ROOMS = [
+const INITIAL_ROOMS = [
   {
     id: "r1",
     title: "Late Night Vibes 🌙",
@@ -96,16 +96,46 @@ const LIVE_ROOMS = [
 ];
 
 export default function LiveRoomTab() {
-  const { showToast, currentUser } = useApp();
-  const [joinedRoom, setJoinedRoom] = useState(null);
+  const { currentUser, showToast } = useApp();
+  const [rooms, setRooms] = useState(INITIAL_ROOMS);
+  const [activeRoom, setActiveRoom] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newRoomTitle, setNewRoomTitle] = useState("");
+  const [newRoomTopic, setNewRoomTopic] = useState("Chill");
   const [isMuted, setIsMuted] = useState(true);
   const [raised, setRaised] = useState(false);
 
-  const liveRooms = LIVE_ROOMS.filter(r => r.live);
-  const scheduled = LIVE_ROOMS.filter(r => !r.live);
+  const handleCreateRoom = (e) => {
+    e.preventDefault();
+    if (!newRoomTitle.trim()) return;
 
-  if (joinedRoom) {
-    const room = LIVE_ROOMS.find(r => r.id === joinedRoom);
+    const newRoom = {
+      id: "r" + Date.now(),
+      title: newRoomTitle,
+      host: currentUser?.name || "You",
+      hostPhoto: currentUser?.photos?.[0] || "/default_avatar.png",
+      listeners: 0,
+      speakers: 1,
+      topic: newRoomTopic,
+      color: "linear-gradient(135deg, #11998e, #38ef7d)",
+      live: true,
+      participants: [
+        { name: currentUser?.name || "You", photo: currentUser?.photos?.[0] || "/default_avatar.png", speaking: true }
+      ]
+    };
+
+    setRooms([newRoom, ...rooms]);
+    setShowCreateModal(false);
+    setNewRoomTitle("");
+    setActiveRoom(newRoom);
+    showToast("Room created successfully!");
+  };
+
+  const liveRooms = rooms.filter(r => r.live);
+  const scheduled = rooms.filter(r => !r.live);
+
+  if (activeRoom) {
+    const room = activeRoom;
     return (
       <div className="fade-in" style={{ padding: "16px", minHeight: "85vh", paddingBottom: 100 }}>
         {/* Room Header */}
@@ -113,7 +143,7 @@ export default function LiveRoomTab() {
           <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.25)" }} />
           <div style={{ position: "relative", zIndex: 1 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-              <button onClick={() => setJoinedRoom(null)}
+              <button onClick={() => setActiveRoom(null)}
                 style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "#fff", padding: "8px 16px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", backdropFilter: "blur(10px)" }}>
                 ← Leave Room
               </button>
@@ -237,7 +267,7 @@ export default function LiveRoomTab() {
             }}>
             💬
           </button>
-          <button onClick={() => { setJoinedRoom(null); showToast("Left the room"); }}
+          <button onClick={() => { setActiveRoom(null); showToast("Left the room"); }}
             style={{
               padding: "10px 20px", borderRadius: 20,
               background: "rgba(239,68,68,0.2)", border: "2px solid rgba(239,68,68,0.4)",
@@ -259,16 +289,57 @@ export default function LiveRoomTab() {
           <div className="serif" style={{ fontSize: 22, fontWeight: 500 }}>Live <span className="glow" style={{ color: "#d4af37" }}>Rooms</span></div>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>Join audio rooms & meet new people</p>
         </div>
-        <button onClick={() => showToast("🎙️ Create Room coming soon!")}
+      </div>
+
+      {/* Floating Create Button */}
+      <div style={{ position:"fixed", bottom:90, right:20, zIndex:10 }}>
+        <button onClick={() => setShowCreateModal(true)}
           style={{
-            background: "linear-gradient(135deg, #d4af37, #b8941f)", border: "none",
-            color: "#0a0a0a", padding: "10px 18px", borderRadius: 20,
-            fontSize: 12, fontWeight: 700, cursor: "pointer",
-            boxShadow: "0 4px 15px rgba(212,175,55,0.3)"
+            background: "linear-gradient(135deg, #ff6b6b, #ffd93d)",
+            border:"none", borderRadius:30, padding:"16px 24px",
+            color:"#111", fontWeight:800, fontSize:15,
+            boxShadow:"0 8px 24px rgba(255,107,107,.4)", cursor:"pointer",
+            display:"flex", alignItems:"center", gap:8
           }}>
           + Create Room
         </button>
       </div>
+
+      {/* Create Room Modal */}
+      {showCreateModal && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.8)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20, backdropFilter:"blur(10px)" }}>
+          <div style={{ background:"#1a1a1a", border:"1px solid rgba(255,255,255,.1)", borderRadius:24, width:"100%", maxWidth:400, padding:24 }}>
+            <h2 style={{ margin:0, marginBottom:20, fontSize:24 }}>Create Live Room</h2>
+            <form onSubmit={handleCreateRoom}>
+              <div style={{ marginBottom:16 }}>
+                <label style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.5)", marginBottom:8, fontWeight:700 }}>ROOM TITLE</label>
+                <input type="text" autoFocus required placeholder="e.g. Late night chat..." value={newRoomTitle} onChange={e => setNewRoomTitle(e.target.value)}
+                  style={{ width:"100%", padding:14, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", borderRadius:12, color:"#fff", fontSize:16, outline:"none" }} />
+              </div>
+              <div style={{ marginBottom:24 }}>
+                <label style={{ display:"block", fontSize:12, color:"rgba(255,255,255,.5)", marginBottom:8, fontWeight:700 }}>TOPIC</label>
+                <select value={newRoomTopic} onChange={e => setNewRoomTopic(e.target.value)}
+                  style={{ width:"100%", padding:14, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", borderRadius:12, color:"#fff", fontSize:16, outline:"none" }}>
+                  <option value="Chill">Chill</option>
+                  <option value="Music">Music</option>
+                  <option value="Dating">Dating</option>
+                  <option value="Travel">Travel</option>
+                </select>
+              </div>
+              <div style={{ display:"flex", gap:12 }}>
+                <button type="button" onClick={() => setShowCreateModal(false)}
+                  style={{ flex:1, padding:14, background:"rgba(255,255,255,.1)", border:"none", borderRadius:12, color:"#fff", fontWeight:700, cursor:"pointer" }}>
+                  Cancel
+                </button>
+                <button type="submit"
+                  style={{ flex:1, padding:14, background:"#ff6b6b", border:"none", borderRadius:12, color:"#fff", fontWeight:700, cursor:"pointer" }}>
+                  Start Room
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Live Now */}
       <div style={{ marginBottom: 24 }}>
@@ -281,7 +352,7 @@ export default function LiveRoomTab() {
           {liveRooms.map((room, i) => (
             <ScrollReveal key={room.id} animation="slideUp" delay={i * 0.1}>
               <div
-                onClick={() => { setJoinedRoom(room.id); setIsMuted(true); setRaised(false); }}
+                onClick={() => { setActiveRoom(room); setIsMuted(true); setRaised(false); }}
                 style={{
                   background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
                   borderRadius: 16, padding: "16px", cursor: "pointer",
