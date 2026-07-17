@@ -198,9 +198,21 @@ export function AppProvider({ children }) {
 
     // Update Firestore
     const userRef = doc(db, "users", currentUser.id);
+    const today = new Date().toDateString();
+    const newSwipeCount = currentUser.lastSwipeDate === today ? (currentUser.swipeCount || 0) + 1 : 1;
+
+    // Optimistic user state update for immediate limit enforcement
+    setCurrentUser(prev => ({
+      ...prev,
+      lastSwipeDate: today,
+      swipeCount: newSwipeCount
+    }));
+
     await updateDoc(userRef, {
       swipedIds: arrayUnion(user.id),
-      likedIds: arrayUnion(user.id)
+      likedIds: arrayUnion(user.id),
+      lastSwipeDate: today,
+      swipeCount: newSwipeCount
     }).catch(console.error);
 
     // Check for match

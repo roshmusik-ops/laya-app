@@ -26,6 +26,15 @@ export default function DiscoverTab() {
 
   const top = filtered[0];
 
+  const hasHitSwipeLimit = () => {
+    if (currentUser?.premium) return false;
+    const today = new Date().toDateString();
+    if (currentUser?.lastSwipeDate === today && (currentUser?.swipeCount || 0) >= 10) {
+      return true;
+    }
+    return false;
+  };
+
   const photos = (user) => (user?.photos || []).filter(Boolean);
 
   const onDragStart = (e) => {
@@ -89,6 +98,21 @@ export default function DiscoverTab() {
 
   const swipeCard = (dir) => {
     if (!top) return;
+    
+    if (dir === "right" && hasHitSwipeLimit()) {
+      setShowPremium(true);
+      // Snap card back
+      if (cardRef.current) {
+        cardRef.current.style.transition = 'transform 0.3s ease';
+        cardRef.current.style.transform = `translateX(0px) rotate(0deg)`;
+      }
+      if (passIndicator.current) passIndicator.current.style.opacity = 0;
+      if (approveIndicator.current) approveIndicator.current.style.opacity = 0;
+      dragX.current = 0;
+      dragStart.current = null;
+      return;
+    }
+
     setAnimating(dir);
     setTimeout(() => {
       dir === "right" ? handleSwipeRight(top) : handleSwipeLeft(top);
@@ -113,14 +137,22 @@ export default function DiscoverTab() {
       </div>
         <div style={{ display:"flex", gap:12, overflowX:"auto", paddingBottom:12, marginTop:24, msOverflowStyle:"none", scrollbarWidth:"none" }}>
           {MODES.map(m => (
-            <button key={m} onClick={() => setFilterMode(m)}
+            <button key={m} onClick={() => {
+              if (m !== "All" && !currentUser?.premium) {
+                setShowPremium(true);
+                return;
+              }
+              setFilterMode(m);
+            }}
               style={{
                 background: filterMode === m ? "linear-gradient(135deg, #d4af37, #b8860b)" : "rgba(255,255,255,.05)",
                 color: filterMode === m ? "#fff" : "rgba(255,255,255,0.7)",
                 border: filterMode === m ? "none" : "1px solid rgba(255,255,255,.1)",
                 padding:"6px 16px", borderRadius:20, fontSize:13, fontWeight:500, cursor:"pointer",
-                whiteSpace:"nowrap", transition:"all .3s"
+                whiteSpace:"nowrap", transition:"all .3s",
+                display: "flex", alignItems: "center", gap: "6px"
               }}>
+              {m !== "All" && !currentUser?.premium && <span style={{ fontSize: 10 }}>🔒</span>}
               {m === "All" ? "All Vibes" : m === "date" ? "Date" : m === "intimacy" ? "Intimacy" : m === "friends" ? "Social" : "Network"}
             </button>
           ))}
