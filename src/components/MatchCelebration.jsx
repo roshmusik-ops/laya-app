@@ -1,7 +1,7 @@
 import { useApp } from "../contexts/AppContext";
 
 export default function MatchCelebration() {
-  const { matchedUser, setShowMatch, setActiveTab, setChatUser } = useApp();
+  const { currentUser, matchedUser, setShowMatch, setActiveTab, setChatUser } = useApp();
   if (!matchedUser) return null;
 
   // Confetti pieces
@@ -33,12 +33,12 @@ export default function MatchCelebration() {
 
         {/* Avatars */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:16, margin:"24px 0" }}>
-          <div style={{ width:84, height:84, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b,#ff4757)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40, boxShadow:"0 0 0 3px #ff6b6b55, 0 12px 32px rgba(255,71,87,.5)", animation:"float 2s ease-in-out infinite" }}>
-            👤
+          <div style={{ width:84, height:84, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b,#ff4757)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40, boxShadow:"0 0 0 3px #ff6b6b55, 0 12px 32px rgba(255,71,87,.5)", animation:"float 2s ease-in-out infinite", overflow:"hidden" }}>
+            {currentUser?.photos?.[0] ? <img src={currentUser.photos[0]} alt="You" style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
           </div>
           <div style={{ fontSize:28 }}>💕</div>
-          <div style={{ width:84, height:84, borderRadius:"50%", background:"linear-gradient(135deg,#ffd93d,#f59e0b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40, boxShadow:"0 0 0 3px #ffd93d55, 0 12px 32px rgba(245,158,11,.5)", animation:"float 2s ease-in-out .4s infinite" }}>
-            {matchedUser.photos?.[0] || "👤"}
+          <div style={{ width:84, height:84, borderRadius:"50%", background:"linear-gradient(135deg,#ffd93d,#f59e0b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40, boxShadow:"0 0 0 3px #ffd93d55, 0 12px 32px rgba(245,158,11,.5)", animation:"float 2s ease-in-out .4s infinite", overflow:"hidden" }}>
+            {matchedUser?.photos?.[0] ? <img src={matchedUser.photos[0]} alt="Match" style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
           </div>
         </div>
 
