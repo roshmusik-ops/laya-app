@@ -636,7 +636,7 @@ export const SONGS = [
 
 function MusicPlayer() {
   const [playing,   setPlaying]   = useState(false);
-  const [songIdx,   setSongIdx]   = useState(0);
+  const [songIdx,   setSongIdx]   = useState(4); // Start with Laya Theme
   const [showLabel, setShowLabel] = useState(false);
   const [showVol,   setShowVol]   = useState(false);
   const [volume,    setVolume]    = useState(0.20);
@@ -685,7 +685,7 @@ function MusicPlayer() {
   useEffect(() => {
     if (!audioRef.current) return;
     const handleEnded = () => {
-      setSongIdx(Math.floor(Math.random() * SONGS.length));
+      setSongIdx((prev) => (prev + 1) % SONGS.length);
       setShowLabel(true);
       setTimeout(() => setShowLabel(false), 3500);
     };
@@ -724,7 +724,7 @@ function MusicPlayer() {
 
   const nextSong = (e) => {
     e.stopPropagation();
-    setSongIdx(Math.floor(Math.random() * SONGS.length));
+    setSongIdx((prev) => (prev + 1) % SONGS.length);
     setShowLabel(true);
     setTimeout(() => setShowLabel(false), 3500);
   };
