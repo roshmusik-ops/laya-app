@@ -29,8 +29,8 @@ export default function ProfileTab() {
         {/* Main photo */}
         <div style={{ position:"relative", display:"inline-block", marginBottom:14 }}>
           <div style={{ width:92, height:92, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b,#ff4757)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:44, boxShadow:"0 12px 36px rgba(255,71,87,.45)", overflow:"hidden" }}>
-            {currentUser.photos?.[0] && currentUser.photos[0].startsWith("data:")
-              ? <img src={currentUser.photos[0]} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+            {currentUser.photos?.[0] && currentUser.photos[0].length > 2
+              ? <img src={currentUser.photos[0]} alt="You" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
               : currentUser.photos?.[0] || "👤"}
           </div>
           <button onClick={() => fileRef.current?.click()}

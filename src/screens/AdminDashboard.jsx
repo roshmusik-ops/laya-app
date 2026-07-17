@@ -304,8 +304,8 @@ export default function AdminDashboard() {
           {filtered.length === 0 && <div style={{textAlign:"center", color:"rgba(255,255,255,.3)", padding:"20px"}}>No users found.</div>}
           {filtered.map(u => (
             <div key={u.id} style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 13px", borderRadius:13, background:"rgba(255,255,255,.03)", border:"1px solid rgba(255,255,255,.06)", marginBottom:7 }}>
-              <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.12)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>
-                {u.photos?.[0] || "👤"}
+              <div style={{ width:38, height:38, borderRadius:"50%", background:"rgba(255,107,107,.12)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0, overflow:"hidden" }}>
+                {u.photos?.[0] ? <img src={u.photos[0]} alt={u.name} style={{width:"100%", height:"100%", objectFit:"cover"}} /> : "👤"}
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ display:"flex", gap:5, alignItems:"center" }}>

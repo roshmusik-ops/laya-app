@@ -28,8 +28,12 @@ export default function AudioCallScreen() {
         {/* Avatar */}
         <div style={{ position:"relative" }}>
           <div style={{ position:"absolute", inset:-20, borderRadius:"50%", background:"radial-gradient(circle,rgba(255,107,107,.18),transparent)", animation:"ripple 2s ease-out infinite" }} />
-          <div style={{ width:130, height:130, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b33,#ff475722)", border:"3px solid rgba(255,107,107,.35)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:60 }}>
-            {activeCall.user.photos?.[0] || "👤"}
+          <div style={{ position:"relative", width:120, height:120, borderRadius:"50%", background:"linear-gradient(135deg,#ff6b6b,#ffd93d)", padding:4, marginBottom:24 }}>
+            <div style={{ width:"100%", height:"100%", borderRadius:"50%", border:"4px solid #080b12", background:"#141828", display:"flex", alignItems:"center", justifyContent:"center", fontSize:48, overflow:"hidden" }}>
+              {activeCall.user.photos?.[0] && activeCall.user.photos[0].length > 2
+                ? <img src={activeCall.user.photos[0]} alt="caller" style={{width:"100%", height:"100%", objectFit:"cover"}} />
+                : activeCall.user.photos?.[0] || "👤"}
+            </div>
           </div>
           {status === "active" && (
             <div style={{ position:"absolute", bottom:6, right:6, width:22, height:22, borderRadius:"50%", background:"#22c55e", border:"2.5px solid #080b12", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10 }}>🎙️</div>

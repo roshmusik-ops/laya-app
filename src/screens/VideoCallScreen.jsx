@@ -151,8 +151,10 @@ export default function VideoCallScreen() {
 
         {status === "connecting" && (
           <div style={{ textAlign:"center" }}>
-            <div style={{ fontSize:64, marginBottom:16, animation:"pulse 1.5s ease infinite" }}>
-              {activeCall.user.photos?.[0] || "👤"}
+            <div style={{ fontSize:64, marginBottom:16, animation:"pulse 1.5s ease infinite", width:120, height:120, borderRadius:"50%", overflow:"hidden", margin:"0 auto" }}>
+              {activeCall.user.photos?.[0] && activeCall.user.photos[0].length > 2 
+                ? <img src={activeCall.user.photos[0]} alt="caller" style={{width:"100%", height:"100%", objectFit:"cover"}} />
+                : activeCall.user.photos?.[0] || "👤"}
             </div>
             <div className="serif" style={{ fontSize:22, marginBottom:8 }}>{activeCall.user.name}</div>
             <p style={{ color:"rgba(255,255,255,.4)", fontSize:14 }}>Connecting...</p>
