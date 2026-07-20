@@ -29,10 +29,21 @@ export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState("discover");
   const [appMode, setAppMode]     = useState("date"); // date|friends|network
 
-  // ── Current user
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem("laya_user");
-    return saved ? JSON.parse(saved) : null;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.premium && parsed.premiumUntil && Date.now() >= parsed.premiumUntil) {
+          parsed.premium = false;
+          parsed.plan = "Free";
+        }
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   });
 
   // Persist user to localStorage
@@ -138,10 +149,12 @@ export function AppProvider({ children }) {
           setLikedIds(data.likedIds || []);
           setCurrentUser(prev => {
             if (!prev) return prev;
+            const isPremium = data.premium ? (!data.premiumUntil || Date.now() < data.premiumUntil) : false;
             return {
               ...prev,
-              premium: data.premium || false,
-              plan: data.plan || "Free",
+              premium: isPremium,
+              premiumUntil: data.premiumUntil || null,
+              plan: isPremium ? (data.plan || "Premium") : "Free",
               status: data.status || "approved"
             };
           });
